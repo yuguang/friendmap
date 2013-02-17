@@ -1,0 +1,8 @@
+mode: regular
+user_name: testusr1
+friend_list: [testusr2, testusr3, testusr4, testusr5, testusr6]
+update_frequency: 10
+update_mode: random
+pull_frequency: 10
+remote_host: friendtracker.org
+remote_port: 7379
