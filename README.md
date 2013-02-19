@@ -1,11 +1,6 @@
 friendmap
 =========
-Friends  Tracker  is  a  mobile  application  that  tracks  the  real-­‐time  location  of  the 
-user’s  friends  and  acquaintances.  This  enables  the  user  to  conveniently  schedule 
-meetings  and  gatherings.  This  app  also  eliminates  the  need  for  text  messages  and 
-phone  calls  to  inquire  your  friend’s  physical  location,  thus  reducing  the  amount  of 
-hassle  and  network  bandwidth  for  social  interactions.  In  addition,  the  app  can  be 
-used  to  find  other  users  with  similar  interest  around  the  user’s  area. 
+a  mobile  application  that  tracks  the  real-­‐time  location  of  the user’s  friends  and  acquaintances.  This  enables  the  user  to  conveniently  schedule meetings  and  gatherings.  This  app  also  eliminates  the  need  for  text  messages  and phone  calls  to  inquire  your  friend’s  physical  location,  thus  reducing  the  amount  of hassle  and  network  bandwidth  for  social  interactions.  In  addition,  the  app  can  be used  to  find  other  users  with  similar  interest  around  the  user’s  area.
 
 Functional  Requirements 
 ------------------------
