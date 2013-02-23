@@ -29,13 +29,13 @@
     };
     window.map = new google.maps.Map(document.getElementById("map_canvas"), options);
     host = "198.58.106.27";
-    port = 7381;
-    socket = new Socket("ws://" + host + ":" + port + "/.json");
+    port = 8080;
+    socket = new WebSocket("ws://" + host + ":" + port + "/");
     socket.onopen = function() {
       var i, _i, _results;
       _results = [];
       for (i = _i = 1; _i <= 7; i = ++_i) {
-        _results.push(socket.sendJSON(["SUBSCRIBE", "testusr" + i]));
+        _results.push(socket.sendJSON({"SUBSCRIBE": "testusr" + i}));
       }
       return _results;
     };

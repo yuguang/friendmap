@@ -106,6 +106,10 @@ function testJSONSub() {
 	jsonSocket.onmessage = function(messageEvent) {
 		log("json-log", "received", messageEvent.data);
 	};
+
+    jsonSocket.onclose = function() {
+        log("json-log", "received", "closed");
+    };
 }
 
 addEventListener("DOMContentLoaded", function(){

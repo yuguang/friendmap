@@ -24,11 +24,11 @@ initialize = ->
 
   window.map = new google.maps.Map(document.getElementById("map_canvas"), options)
   host = "198.58.106.27"
-  port = 7381
-  socket = new Socket("ws://" + host + ":" + port + "/.json")
+  port = 8080
+  socket = new Socket("ws://" + host + ":" + port + "/")
   socket.onopen = ->
-    for i in [1..7]
-      socket.sendJSON ["SUBSCRIBE", "testusr#{i}"]
+    for i in [1..6]
+      socket.sendJSON {"SUBSCRIBE": "testusr#{i}"}
   socket.onmessage = (message) ->
     data = this.decodeJSON(message)
     if data
