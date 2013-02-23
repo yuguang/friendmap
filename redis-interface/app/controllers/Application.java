@@ -18,7 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import utils.Redis;
 import models.RedisSubscriber;
-import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,12 +38,15 @@ public class Application extends Controller {
                 in.onMessage(new F.Callback<JsonNode>() {
                     public void invoke(JsonNode event) {
                         final String channel = event.findPath("SUBSCRIBE").getTextValue();
-                        System.out.println("Subscribing to " + channel);
+                        Logger.of("Application").info("Subscribing to " + channel);
 
-                        RedisSubscriber sub = new RedisSubscriber(in, out);
+                        final RedisSubscriber sub = new RedisSubscriber(in, out);
                         PubSubMap.put(in, sub);
-                        Redis.getInstance().getJedis().subscribe(sub, channel);
-                        System.out.println("hello");
+                        new Thread(new Runnable() {
+                            public void run() {
+                                Redis.getJedisInstance().subscribe(sub, channel);
+                            }
+                        }).start();
                     }
                 });
 

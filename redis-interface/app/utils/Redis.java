@@ -34,4 +34,11 @@ public class Redis {
         return jedis;
     }
 
+    // create new connection everytime
+    public static Jedis getJedisInstance() {
+        Jedis j = new Jedis("127.0.0.1", 6379);
+        j.auth("friendtracker-pass");
+        return j;
+    }
+
 }
