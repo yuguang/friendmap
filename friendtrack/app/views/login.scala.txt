@@ -1,0 +1,8 @@
+@(ppid:String, X:String, Y: String, friend: String)
+
+Hi:
+You have successfully logged in Friendtracker!
+Your ID is: @ppid at @X,@Y
+Friend list: @friend
+
+---------------------------------------------

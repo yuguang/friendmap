@@ -1,0 +1,7 @@
+@(ppid:String, X:String, Y: String)
+
+Hi:
+You have successfully updated location on Friendtracker!
+Your ID is: @ppid at @X,@Y
+
+---------------------------------------------
