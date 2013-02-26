@@ -75,7 +75,7 @@ def publisher_thread(user_ppid):
             r.publish(ppid, str(cur_location[0]) + "," + str(cur_location[1]))
             print ppid + " " + str(cur_location)
             dist = get_distance(cur_location, locations[dest_pos])
-            time.sleep(5)   # wait 5 sec
+            time.sleep(0.5)   # wait 5 sec
             cur_location[0] += lat_diff * 5 / travel_time
             cur_location[1] += lon_diff * 5 / travel_time
             #print "distance " + str(get_distance(cur_location, locations[dest_pos]))

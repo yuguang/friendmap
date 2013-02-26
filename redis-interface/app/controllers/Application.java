@@ -39,6 +39,7 @@ public class Application extends Controller {
                     public void invoke(JsonNode event) {
                         final String channel = event.findPath("SUBSCRIBE").getTextValue();
                         Logger.of("Application").info("Subscribing to " + channel);
+                        System.out.println("Subscribing to " + channel);
 
                         final RedisSubscriber sub = new RedisSubscriber(in, out);
                         PubSubMap.put(in, sub);

@@ -25,9 +25,9 @@ initialize = ->
   window.map = new google.maps.Map(document.getElementById("map_canvas"), options)
   host = "198.58.106.27"
   port = 8080
-  socket = new Socket("ws://" + host + ":" + port + "/")
+  socket = new WebSocket("ws://" + host + ":" + port + "/")
   socket.onopen = ->
-    for i in [1..6]
+    for i in [1..20]
       socket.sendJSON {"SUBSCRIBE": "testusr#{i}"}
   socket.onmessage = (message) ->
     data = this.decodeJSON(message)
