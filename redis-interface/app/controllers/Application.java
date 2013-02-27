@@ -38,16 +38,30 @@ public class Application extends Controller {
                 in.onMessage(new F.Callback<JsonNode>() {
                     public void invoke(JsonNode event) {
                         final String channel = event.findPath("SUBSCRIBE").getTextValue();
-                        Logger.of("Application").info("Subscribing to " + channel);
-                        System.out.println("Subscribing to " + channel);
+                        if (channel != null) {
+                            Logger.of("Application").info("Subscribing to " + channel);
+                            System.out.println("Subscribing to " + channel);
 
-                        final RedisSubscriber sub = new RedisSubscriber(in, out);
-                        PubSubMap.put(in, sub);
-                        new Thread(new Runnable() {
-                            public void run() {
-                                Redis.getJedisInstance().subscribe(sub, channel);
-                            }
-                        }).start();
+                            final RedisSubscriber sub = new RedisSubscriber(in, out);
+                            PubSubMap.put(in, sub);
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    Redis.getJedisInstance().subscribe(sub, channel);
+                                }
+                            }).start();
+                        } else if (event.findPath("GET").getTextValue() != null) {
+                            Logger.info("Got GET request");
+                            final String userId = event.findPath("GET").getTextValue();
+                            String value = Redis.getInstance().get(userId);
+                            ObjectNode reply = Json.newObject();
+                            ArrayNode body = reply.putArray("GET");
+                            body.add("message");
+                            body.add(userId);
+                            body.add(value);
+                            out.write(reply);
+
+                            Logger.info("Get reply - " + value + " sent");
+                        }
                     }
                 });
 

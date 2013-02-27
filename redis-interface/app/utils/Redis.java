@@ -25,6 +25,10 @@ public class Redis {
         System.out.println(status);
     }
 
+    public String get(String key) {
+        return jedis.get(key);
+    }
+
     public void publish(String key, String message) {
         Long result = jedis.publish(key, message);
         System.out.println(result);
