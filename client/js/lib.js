@@ -52,4 +52,6 @@
 
   window.Socket = Socket;
 
+  window.User = User;
+
 }).call(this);
