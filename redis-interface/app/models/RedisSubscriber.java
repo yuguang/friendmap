@@ -30,7 +30,7 @@ public class RedisSubscriber extends JedisPubSub {
         body.add(message);
         out.write(reply);
 
-        Logger.debug("message:" + channel + "," + message);
+        //Logger.debug("message:" + channel + "," + message);
     }
 
     @Override

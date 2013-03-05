@@ -70,7 +70,7 @@ public class Application extends Controller {
                             body.add(value);
                             out.write(reply);
 
-                            Logger.debug("Get reply - " + value + " sent");
+                            //Logger.debug("Get reply - " + value + " sent");
                         }
                     }
                 });
