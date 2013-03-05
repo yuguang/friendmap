@@ -30,8 +30,7 @@ public class RedisSubscriber extends JedisPubSub {
         body.add(message);
         out.write(reply);
 
-        Logger.of("RedisSubscriber")
-            .info("message:" + channel + "," + message);
+        Logger.debug("message:" + channel + "," + message);
     }
 
     @Override
@@ -43,8 +42,7 @@ public class RedisSubscriber extends JedisPubSub {
         body.add(subscribedChannels);
         out.write(reply);
 
-        Logger.of("RedisSubscriber")
-            .info("subscribe:" + channel + "," + subscribedChannels);
+        Logger.info("subscribe:" + channel + "," + subscribedChannels);
     }
 
     @Override
@@ -56,8 +54,7 @@ public class RedisSubscriber extends JedisPubSub {
         body.add(subscribedChannels);
         out.write(reply);
 
-        Logger.of("RedisSubscriber")
-            .info("unsubscribe:" + channel + "," + subscribedChannels);
+        Logger.info("unsubscribe:" + channel + "," + subscribedChannels);
     }
 
     @Override
