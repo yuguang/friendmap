@@ -60,7 +60,7 @@ public class Application extends Controller {
                                 }
                             });
                         } else if (event.findPath("GET").getTextValue() != null) {
-                            Logger.info("Got GET request from " + ipAddress);
+                            Logger.info("received " + event.toString() + " from " + ipAddress);
                             final String userId = event.findPath("GET").getTextValue();
                             String value = Redis.getInstance().get(userId);
                             ObjectNode reply = Json.newObject();
