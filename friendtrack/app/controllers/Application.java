@@ -27,9 +27,10 @@ public class Application extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result loginUser() {
         String ipAddress = request().remoteAddress();
-        Logger.info("received " + request().body().asText() + " from " + ipAddress);
 
         JsonNode inputs = request().body().asJson();
+        Logger.info("received " + inputs.toString() + " from " + ipAddress);
+
         String ppid = inputs.findPath("ppId").getTextValue();
         double x = inputs.findPath("x").getDoubleValue();
         double y = inputs.findPath("y").getDoubleValue();
@@ -75,9 +76,10 @@ public class Application extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateLocation(){
         String ipAddress = request().remoteAddress();
-        Logger.info("received " + request().body().asText() + " from " + ipAddress);
 
         JsonNode inputs = request().body().asJson();
+        Logger.info("received " + inputs.toString() + " from " + ipAddress);
+
         String ppid = inputs.findPath("ppId").getTextValue();
         double x = inputs.findPath("x").getDoubleValue();
         double y = inputs.findPath("y").getDoubleValue();
