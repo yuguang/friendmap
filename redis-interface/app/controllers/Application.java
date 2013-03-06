@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 
 public class Application extends Controller {
 
-    private static final int NTHREADS = 20;
+    private static final int NTHREADS = 5;
     private static final ExecutorService executor
         = Executors.newFixedThreadPool(NTHREADS);
 
