@@ -24,23 +24,11 @@ public class Application extends Controller {
         return ok(index.render("Your new application is ready."));
     }
     
-    public static boolean Addnew(String ppid, double X, double Y){
-        //Add to DB
-        return true;
-    }
-    
-    //add login verification here
-    public static boolean verify(String ppid){
-        //search SQL;
-        return true;
-    }
-    
-    public static void updateloc(){
-        //update DB
-    }
-    
     @BodyParser.Of(BodyParser.Json.class)
     public static Result loginUser() {
+        String ipAddress = request().remoteAddress();
+        Logger.info("received " + request().body().asText() + " from " + ipAddress);
+
         JsonNode inputs = request().body().asJson();
         String ppid = inputs.findPath("ppId").getTextValue();
         double x = inputs.findPath("x").getDoubleValue();
@@ -86,6 +74,9 @@ public class Application extends Controller {
     
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateLocation(){
+        String ipAddress = request().remoteAddress();
+        Logger.info("received " + request().body().asText() + " from " + ipAddress);
+
         JsonNode inputs = request().body().asJson();
         String ppid = inputs.findPath("ppId").getTextValue();
         double x = inputs.findPath("x").getDoubleValue();

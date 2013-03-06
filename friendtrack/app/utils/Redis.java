@@ -22,12 +22,10 @@ public class Redis {
 
     public void set(String key, String value) {
         String status = jedis.set(key, value);
-        System.out.println(status);
     }
 
     public void publish(String key, String message) {
         Long result = jedis.publish(key, message);
-        System.out.println(result);
     }
 
 }
