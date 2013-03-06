@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
     javaCore,
     javaJdbc,
     javaEbean,
-    "redis.clients" % "jedis" % "2.0.0"
+    "com.lambdaworks" % "lettuce" % "2.3.0"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(

@@ -17,25 +17,37 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import utils.Redis;
-import models.RedisSubscriber;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Application extends Controller {
 
-    private static HashMap<WebSocket.In<JsonNode>, RedisSubscriber> PubSubMap
-        = new HashMap<WebSocket.In<JsonNode>, RedisSubscriber>();
-
     private static final int NTHREADS = 20;
-
-    private static final ExecutorService exec
+    private static final ExecutorService executor
         = Executors.newFixedThreadPool(NTHREADS);
 
+    // asynchronously send GET reply through out WebSocket
+    private static void sendResponse(String userId, Future<String> futureVal, WebSocket.Out<JsonNode> out) {
+        try {
+            String val = futureVal.get();
+            ObjectNode reply = Json.newObject();
+            ArrayNode body = reply.putArray("GET");
+            body.add("message");
+            body.add(userId);
+            body.add(val);
+            out.write(reply);
+        } catch (InterruptedException e) {
+            Logger.error("sending response to " + userId + " was interrupted.");
+        } catch (ExecutionException e) {
+            Logger.error("execution exception " + userId + " " + e.getMessage());
+        }
+    }
+        
     @BodyParser.Of(BodyParser.Json.class)
     public static WebSocket<JsonNode> index() {
 
@@ -48,41 +60,28 @@ public class Application extends Controller {
                 // for each subscribe message
                 in.onMessage(new F.Callback<JsonNode>() {
                     public void invoke(JsonNode event) {
+                        Logger.info("received " + event.toString() + " from " + ipAddress);
                         final String channel = event.findPath("SUBSCRIBE").getTextValue();
                         if (channel != null) {
-                            Logger.info("Subscribing to " + channel + " from " + ipAddress);
-
-                            final RedisSubscriber sub = new RedisSubscriber(in, out);
-                            PubSubMap.put(in, sub);
-                            exec.execute(new Runnable() {
+                            // subscribe through async connection
+                            Redis.getInstance().subscribe(channel, out);
+                        } else if (event.findPath("GET").getTextValue() != null) {
+                            final String userId = event.findPath("GET").getTextValue();
+                            final Future<String> val = Redis.getInstance().get(userId);
+                            executor.execute(new Runnable() {
                                 public void run() {
-                                    Redis.getJedisInstance().subscribe(sub, channel);
+                                    sendResponse(userId, val, out);
                                 }
                             });
-                        } else if (event.findPath("GET").getTextValue() != null) {
-                            Logger.info("received " + event.toString() + " from " + ipAddress);
-                            final String userId = event.findPath("GET").getTextValue();
-                            String value = Redis.getInstance().get(userId);
-                            ObjectNode reply = Json.newObject();
-                            ArrayNode body = reply.putArray("GET");
-                            body.add("message");
-                            body.add(userId);
-                            body.add(value);
-                            out.write(reply);
-
-                            //Logger.debug("Get reply - " + value + " sent");
                         }
                     }
                 });
 
                 in.onClose(new F.Callback0() {
                     public void invoke() {
-                        RedisSubscriber sub = PubSubMap.get(in);
-                        if (sub != null) {
-                            sub.unsubscribe();
-                            Logger.info("Unsubscribed");
-                            PubSubMap.remove(in);
-                        }
+                        // remove websocket from subscription list
+                        Redis.getInstance().unsubscribe(ipAddress, out);
+                        Logger.info("unsubscribe client " + ipAddress);
                     }
                 });
             }
