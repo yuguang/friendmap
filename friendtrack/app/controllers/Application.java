@@ -44,7 +44,7 @@ public class Application extends Controller {
             user.save();        // update user on cache
         } catch (Exception e) {
             // add a user if not in DB
-            user = new User(ppid, x, y);
+            user = new User(ppid, x, y, 1);
             try {
                 user.save(true);
             } catch (Exception e2) {
@@ -64,9 +64,14 @@ public class Application extends Controller {
         ArrayNode arrayNode = reply.putArray("friends");
 
         for (JsonNode friend : inputs.findPath("friends")) {
-            Object obj = Cache.get(friend.getTextValue());
-            if ((obj != null) && !friend.getTextValue().equals(ppid)) {
-                arrayNode.add(friend);
+            User obj = (User)Cache.get(friend.getTextValue());
+            try {
+                if ((obj != null) && !friend.getTextValue().equals(ppid)) {
+                    arrayNode.add(friend);
+                }
+            } catch (Exception e) {
+                Logger.error("user " + friend.toString() + " does not exist");
+                return ok("user " + friend.toString() + " does not exist");
             }
         }
 
@@ -102,4 +107,26 @@ public class Application extends Controller {
         return ok(reply);
     }
 
+    public static Result setVisibility(int State, String ppid) {
+        User user = null;
+        try {
+            user = DB.getInstance().getUser(ppid);
+            user.setVisibility(State);
+            user.save(true);
+        } catch (Exception e) {
+            Logger.error("user " + ppid + " does not exist");
+            return ok("user " + ppid + " does not exist");
+        }
+
+        String res = "";
+        if (State == 0) {
+            res = " Invisible";
+        } else if (State == 1) {
+            res = " visible";
+        } else {
+            res = " What????";
+        }
+
+        return ok(ppid + " is " + res + " now.");
+    }
 }

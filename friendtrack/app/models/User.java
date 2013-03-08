@@ -9,11 +9,13 @@ public class User {
 
     private String ppId;
     private double x, y;
+    private int visibility;
 
-    public User(String ppId, double x, double y) {
+    public User(String ppId, double x, double y, int visibility) {
         this.ppId = ppId;
         this.x = x;
         this.y = y;
+        this.visibility = visibility;
     }
 
     public boolean save() throws SQLException {
@@ -44,6 +46,10 @@ public class User {
         return y;
     }
 
+    public int getVisiblity() {
+        return visibility;
+    }
+
     public void setX(double x) {
         this.x = x;
     }
@@ -52,4 +58,7 @@ public class User {
         this.y = y;
     }
 
+    public void setVisibility(int visibility) {
+        this.visibility = visibility;
+    }
 }

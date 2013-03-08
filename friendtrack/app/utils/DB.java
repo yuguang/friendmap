@@ -40,6 +40,7 @@ public class DB {
         st.setString(1, user.getppId());
         st.setDouble(2, user.getX());
         st.setDouble(3, user.getY());
+        st.setInt(4, user.getVisibility());
         st.executeUpdate();
 
         return true;
@@ -51,7 +52,7 @@ public class DB {
         st.setString(1, ppId);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
-            User user = new User(ppId, rs.getDouble(3), rs.getDouble(4));
+            User user = new User(ppId, rs.getDouble(3), rs.getDouble(4), rs.getInt(5));
             return user;
         } else {
             return null;
