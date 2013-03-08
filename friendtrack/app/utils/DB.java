@@ -40,7 +40,7 @@ public class DB {
         st.setString(1, user.getppId());
         st.setDouble(2, user.getX());
         st.setDouble(3, user.getY());
-        st.setInt(4, user.getVisibility());
+        st.setInt(4, user.getVisiblity());
         st.executeUpdate();
 
         return true;
