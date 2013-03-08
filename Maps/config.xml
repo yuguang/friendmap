@@ -34,6 +34,7 @@
 
     <access uri="http://virtualearth.net" subdomains="true" />
     <access uri="http://bing.net" subdomains="true" />
+    <access uri="http://friendtracker.org" subdomains="true" />
 
     <feature id="blackberry.app">
         <param name="mode" value="portrait" />

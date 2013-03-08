@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<!--
+* Copyright 2010-2012 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+<div data-bb-type="screen" data-bb-effect="slide-left" data-bb-scroll-effect="off">
+	<div data-bb-type="title" data-bb-caption="Friends" data-bb-img="images/me.png" data-bb-accent-text="Available"></div>
+	<script src="js/titlePillButtons.js" onunload="titlePillButtons_UnInit()"></script>
+	<script src="js/lib.js"></script>
+	<style type="text/css">
+		.selectionHeader {
+			left:0px;
+			right:0px;
+			padding-top: 3px;
+			padding-bottom: 10px;
+			border-bottom-width: 1px;
+			border-bottom-style: solid;
+			border-bottom-color: #5C5C5C;
+		}
+	</style>
+	
+	<div id="header" class="selectionHeader">
+		<div data-bb-type="pill-buttons">
+		  <div data-bb-type="pill-button" data-bb-selected="true" onclick="titlePillButtons_showList('received')">Online (12)</div>
+		  <div data-bb-type="pill-button" onclick="titlePillButtons_showList('sent')">Offline (3)</div>
+	  </div>
+	</div>
+	
+	<div id="myScroller" data-bb-type="scroll-panel" style="height:600px">
+		<div id="received" data-bb-type="image-list" data-bb-image-effect="fade" data-bb-image-placeholder="images/default.png1">
+		</div>
+		
+		<div id="sent" data-bb-type="image-list" data-bb-image-effect="fade" data-bb-header-justify="left" style="display:none">
+			<div data-bb-type="item" data-bb-img="images/avatars/alec.png" data-bb-title="Alec Saunders" data-bb-accent-text="4:59 PM">Waiting for a response</div>	
+			<div data-bb-type="item" data-bb-img="images/avatars/anders.png" data-bb-title="Anders Larsson" data-bb-accent-text="4:59 PM">Waiting for a response</div>
+			<div data-bb-type="item" data-bb-img="images/avatars/brian.png" data-bb-title="Brian Zubert" data-bb-accent-text="11:30 AM">Waiting for a response</div>
+		</div>
+	</div>
+	
+	<div data-bb-type="action-bar" data-bb-back-caption="Back"></div>
+</div>

@@ -19,7 +19,10 @@
  */
  
 var initial = true;
-var mapProvider = 'google';   // initial map provider is google
+var mapProvider = 'bing';   // initial map provider is google
+var ppId = null;
+var friends = [];
+var onlinefriends = [];
 
 function initApp() {
     APIKey = {
@@ -27,8 +30,41 @@ function initApp() {
     };
 
     console.log('app initialized');
-    startGeolocation();
-    startSubscription();        // TODO: wait until map is initialized
+
+    // Get my ppId
+    ppId = 'testusr1';                                  // TODO: grab from bbm contact
+    friends = ["testusr2", "testusr3", "testusr4"];     // TODO: get friends from bbm
+    startGeolocation();                                 // login done after getting user's location
+                                                        // also subscription is started on successful login
+}
+
+/**
+ * Login to friendtrack server
+ * @returns list of online friends
+ */
+function login(ppId, friends) {
+    $.ajax({
+        type: 'POST',
+        url: "http://friendtracker.org:9000/login",
+        data: JSON.stringify({
+            "ppId": ppId,
+            "x": myLat,
+            "y": myLong,
+            "friends": friends}
+        ),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(reply) {
+            // parse response and return online friends
+            var status = reply.status;
+            var sessionKey = reply.sessionKey;
+            onlinefriends = reply.friends;
+            startSubscription(onlinefriends);
+        },
+        error: function(xhr, status, msg) {
+            console.log("ajax error - " + status + " " + msg);
+        }
+    });
 }
 
 function getCurrentMap() {
@@ -183,6 +219,7 @@ function geoSuccess(position) {
     console.log('geoSuccess pushing screen');
     // only run once during initialization
     if (initial) {
+        onlinefriends = login(ppId, friends);
         bb.pushScreen('google.html', mapProvider);
         initial = false;
     }  
