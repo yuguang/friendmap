@@ -216,7 +216,7 @@ function geoSuccess(position) {
     if (g_map !== null) {
         g_map.plotSelf();    
     }
-    console.log('geoSuccess pushing screen');
+//    console.log('geoSuccess pushing screen');
     // only run once during initialization
     if (initial) {
         onlinefriends = login(ppId, friends);

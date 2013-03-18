@@ -70,7 +70,7 @@ BingMap.prototype = {
 	},
     centerToLoc: function(lat,long) {
         this.bingMap.setView({
-            center: new Microsoft.Maps.Location(lat, long);
+            center: new Microsoft.Maps.Location(lat, long)
         });
     }
 };

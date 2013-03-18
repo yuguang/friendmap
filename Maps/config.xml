@@ -31,6 +31,13 @@
         See the License for the specific language governing permissions and limitations under the License.
     </license>
     <access uri="*" subdomains="true" />
+    <!-- Do not cache content. -->
+    <rim:cache disableAllCache="true" />
+
+    <!-- Required permissions. -->
+    <rim:permissions>
+        <rim:permit>access_pimdomain_contacts</rim:permit>
+    </rim:permissions>
 
     <access uri="http://virtualearth.net" subdomains="true" />
     <access uri="http://bing.net" subdomains="true" />
@@ -39,8 +46,6 @@
     <feature id="blackberry.app">
         <param name="mode" value="portrait" />
     </feature>
+    <feature id="blackberry.pim.contacts" />
 
-    <rim:permissions>  
-        <rim:permit>access_location_services</rim:permit>
-    </rim:permissions>
 </widget>
