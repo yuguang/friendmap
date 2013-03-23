@@ -47,19 +47,16 @@ function initMaps(lat, lng) {
     Microsoft.Maps.Events.addHandler(bingMap, 'click', clicked);
 
     // put pushpin for the user
-    var iconpath = "local:///assets/images/pin.png";
-    mypin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(myLat, myLong),{
-    	icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: false});
-    bingMap.entities.push(mypin);
-    Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
+    userImages = {"testusr1": "http://placekitten.com/24/24", "testusr2": "http://placekitten.com/24/24", "testusr3": "http://placekitten.com/24/24", "testusr4": "http://placekitten.com/24/24", "testusr5": "http://placekitten.com/24/24", "testusr6": "http://placekitten.com/24/24"}
+
+    myUserId = "testusr1"
+    createPushPin(myLat, myLong, myUserId, userImages[myUserId])
 
     var friends = ["testusr1", "testusr2", "testusr3", "testusr4", "testusr5", "testusr6"];
     startSubscription(friends, this);
 
     console.log("Done init BingMaps");
 }
-
-userImages = {"testusr1": "http://placekitten.com/20/20", "testusr2": "http://placekitten.com/20/20", "testusr3": "http://placekitten.com/20/20", "testusr4": "http://placekitten.com/20/20", "testusr5": "http://placekitten.com/20/20", "testusr6": "http://placekitten.com/20/20"}
 
 function plot(data) {
 	if (data.user in friendsPins) {
@@ -113,13 +110,12 @@ function setMapTypeId(mapType) {
 function createPushPin(lat, lon, title, iconpath) {
     var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {
         text: title,
-        textOffset: new Microsoft.Maps.Point(0, 20),
-        width: 45,
+        textOffset: new Microsoft.Maps.Point(20, 10),
+        width: 125,
         typeName: 'blackText',
         icon: iconpath,
         height: 60,
-        width: 60,
-        anchor: new Microsoft.Maps.Point(20, 58),
+        anchor: new Microsoft.Maps.Point(20, 50),
         draggable: true
     });
     bingMap.entities.push(pin);
@@ -128,7 +124,7 @@ function createPushPin(lat, lon, title, iconpath) {
     friendsPins[title] = pin;
 
     //Remove: set center on user
-    setCenter(lat, lon);
+//    setCenter(lat, lon);
 }
 
 function updatePushPin(lat, lon, title) {
