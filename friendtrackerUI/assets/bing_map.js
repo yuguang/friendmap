@@ -45,17 +45,17 @@ function initMaps(lat, lng) {
 
     Microsoft.Maps.Events.addHandler(bingMap, 'viewchange', centerChanged);
     Microsoft.Maps.Events.addHandler(bingMap, 'click', clicked);
-    
+
     // put pushpin for the user
     var iconpath = "local:///assets/images/pin.png";
     mypin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(myLat, myLong),{
     	icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: false});
     bingMap.entities.push(mypin);
     Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
-    
+
     var friends = ["testusr1", "testusr2", "testusr3", "testusr4", "testusr5", "testusr6"];
     startSubscription(friends, this);
-    
+
     console.log("Done init BingMaps");
 }
 
@@ -66,7 +66,7 @@ function plot(data) {
 		updatePushPin(data.location.x, data.location.y, data.user, userImages[data.user]);
 	} else {
     // username console.log(data.user)
-		createPushPin(data.location.x, data.location.y, data.user, userImages[data.user]);	
+		createPushPin(data.location.x, data.location.y, data.user, userImages[data.user]);
 	}
 }
 
@@ -111,12 +111,22 @@ function setMapTypeId(mapType) {
 
 // create a marker / push-pin
 function createPushPin(lat, lon, title, iconpath) {
-    var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {text: title, textOffset: new Microsoft.Maps.Point(0, 20), width: 45, typeName: 'blackText', icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: true});
+    var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {
+        text: title,
+        textOffset: new Microsoft.Maps.Point(0, 20),
+        width: 45,
+        typeName: 'blackText',
+        icon: iconpath,
+        height: 60,
+        width: 60,
+        anchor: new Microsoft.Maps.Point(20, 58),
+        draggable: true
+    });
     bingMap.entities.push(pin);
     Microsoft.Maps.Events.addHandler(pin, 'click', markerClicked);
     markersArray.push(pin);
     friendsPins[title] = pin;
-    
+
     //Remove: set center on user
     setCenter(lat, lon);
 }

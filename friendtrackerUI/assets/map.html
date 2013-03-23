@@ -17,19 +17,28 @@
 <html>
     <head>
         <title>Maps Sample</title>
-        <link rel="stylesheet" href="local:///assets/style.css" type="text/css" media="screen" />
 
-		<script src="local:///assets/lib.js"></script>
-        <script src="$$SCRIPT_FILE$$"></script>
+		<script src="lib.js"></script>
+        <script src="bing_map.js"></script>
 
-        <script src="$$MAP_URL$$"></script>
+        <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=en-gb"></script>
 
         <script type="text/javascript">
             function load(){
-                initMaps($$INIT_LAT$$, $$INIT_LNG$$);
+                initMaps(43.465187, -80.522372);
             }
         </script>
 
+	<style type="text/css">
+        .blackText div {
+            color: black !important;
+        }
+        a.blackText img{
+            padding:1px;
+            border:1px solid #021a40;
+            background-color:#ff0;
+        }
+	</style>
     </head>
     <body onload="load()">
         <div id="map_canvas"></div>
