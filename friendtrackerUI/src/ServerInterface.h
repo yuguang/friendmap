@@ -29,6 +29,7 @@ public:
 signals:
 	void onSessionKeyChanged(const QString& sessionKey);
 	void onFriendListChanged(const QStringList &);
+	void loginFailed();
 
 public slots:
 	void parseReply(QNetworkReply* );

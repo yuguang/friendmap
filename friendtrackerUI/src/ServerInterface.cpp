@@ -9,6 +9,8 @@
 #include <sstream>
 #include <QNetworkRequest>
 #include <bb/data/JsonDataAccess>
+#include <bb/system/SystemToast>
+
 #include <iostream>
 
 #include "LoginReply.h"
@@ -16,6 +18,7 @@
 
 using namespace std;
 using namespace bb::data;
+using namespace bb::system;
 
 ServerInterface::ServerInterface(QObject* parent)
 : QObject(parent)
@@ -76,6 +79,14 @@ void ServerInterface::parseReply(QNetworkReply* reply)
 				if (reply->getType() == "login") {
 					emit onSessionKeyChanged(dynamic_cast<LoginReply *>(reply)->getSessionKey());
 					emit onFriendListChanged(dynamic_cast<LoginReply *>(reply)->getFriends());
+				}
+			} else {
+				if (reply->getType() == "login") {
+					SystemToast toast;
+					toast.setBody("Oops, Login Failed!");
+					toast.exec();
+					// kill application here
+					emit loginFailed();
 				}
 			}
 			Q_UNUSED(result);

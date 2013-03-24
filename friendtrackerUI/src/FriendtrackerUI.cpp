@@ -72,6 +72,12 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 			this,
 			SLOT(setOnlinePpIds(const QStringList &)));
 	Q_ASSERT(connected);
+
+	connected = QObject::connect(m_serverInterface,
+			SIGNAL(loginFailed()),
+			this,
+			SLOT(endApplication()));
+	Q_ASSERT(connected);
 	Q_UNUSED(connected);
 }
 
@@ -89,6 +95,11 @@ void FriendtrackerUI::setSessionKey(const QString& sessionKey)
 {
 	cout << "new session key: " << sessionKey.toStdString() << endl;
 	m_sessionKey = sessionKey;
+}
+
+void FriendtrackerUI::endApplication()
+{
+	m_app->exit();
 }
 
 void FriendtrackerUI::setOnlinePpIds(const QStringList& ppIds)

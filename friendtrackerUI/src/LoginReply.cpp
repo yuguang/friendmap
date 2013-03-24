@@ -14,6 +14,10 @@
 using namespace std;
 using namespace bb::data;
 
+LoginReply::LoginReply()
+: m_status(false)
+{}
+
 bool LoginReply::parse(const QByteArray& data)
 {
 	JsonDataAccess jsonObject;

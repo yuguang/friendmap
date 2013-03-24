@@ -16,16 +16,26 @@
 #include <bb/cascades/Image>
 #include <bb/platform/bbm/UserStatus>
 #include <bb/platform/bbm/ImageType>
-#include <bb/system/InvokeTargetReply>
-#include <bb/cascades/pickers/FilePicker>
 
-#include "RegistrationHandler.hpp"
-
+// forward decl
 namespace bb {
 	namespace system {
 		class CardDoneMessage;
+		class InvokeTargetReply;
+	}
+	namespace platform {
+		namespace bbm {
+			class UserProfile;
+		}
+	}
+	namespace cascades {
+		namespace pickers {
+			class FilePicker;
+		}
 	}
 }
+class RegistrationHandler;
+
 class Settings : public QObject {
 	Q_OBJECT
 	Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
@@ -37,7 +47,7 @@ public:
 	Settings(QObject* parent, RegistrationHandler* regHandler);
 	virtual ~Settings();
 
-	Q_INVOKABLE void show();
+	Q_INVOKABLE void initUserProfileFromBBM();
 	Q_INVOKABLE void openCamera();
 
 	QString displayName();
@@ -47,30 +57,36 @@ public:
 
 public Q_SLOTS:
 	void setDisplayName(const QString& displayName);
+	void setDisplayNameFromBBM(const QString& displayName);
 	void setProfilePicture(const bb::cascades::Image& profilePicture);
-	void setProfilePicture(bb::platform::bbm::ImageType::Type mimeType, const QByteArray& profilePicture);
+	void setProfilePictureFromBBM(bb::platform::bbm::ImageType::Type mimeType, const QByteArray& profilePicture);
 	void setStatusMessage(const QString& statusMessage);
-	void setStatusMessage(bb::platform::bbm::UserStatus::Type statusType, const QString& statusMessage);
+	void setStatusMessageFromBBM(bb::platform::bbm::UserStatus::Type statusType, const QString& statusMessage);
 	void setPersonalMessage(const QString& personalMessage);
+	void setPersonalMessageFromBBM(const QString& personalMessage);
 	void onCameraInvokeResult();
 	void cameraCardDone(const bb::system::CardDoneMessage &);
-	void updateProfilePicture(const QStringList &);
+	Q_INVOKABLE void updateProfilePicture(const QStringList &);
 
 signals:
 	void displayNameChanged(const QString& displayName);
 	void profilePictureChanged(const bb::cascades::Image& profilePicture);
 	void statusMessageChanged(const QString& statusMessage);
+	void statusMessageChangedFromBBM(const QString& statusMessage);
 	void personalMessageChanged(const QString& personalMessage);
 
 private:
-	QString m_displayName;
-	bb::cascades::Image m_profilePicture;
 	QObject* m_parent;
 	RegistrationHandler* m_regHandler;
-	QString m_statusMessage;
-	QString m_personalMessage;
+	bb::platform::bbm::UserProfile* m_userProfile;
 	bb::system::InvokeTargetReply* m_cameraInvokeStatus;
 	bb::cascades::pickers::FilePicker* m_filePicker;
+	bool m_initialized;
+
+	QString m_displayName;
+	bb::cascades::Image m_profilePicture;
+	QString m_statusMessage;
+	QString m_personalMessage;
 };
 
 

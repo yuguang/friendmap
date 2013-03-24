@@ -41,6 +41,7 @@ public Q_SLOTS:
 	void login(const QGeoCoordinate &);
 	void updateLocation(const QGeoCoordinate &);
 	void setSessionKey(const QString &);
+	void endApplication();
 	QStringList onlinePpIds();
 	void setOnlinePpIds(const QStringList& ppIds);
 

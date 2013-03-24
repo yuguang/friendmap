@@ -16,6 +16,8 @@
 class LoginReply : public Reply
 {
 public:
+	LoginReply();
+
 	bool parse(const QByteArray& data);
 	QString getType() const;
 
