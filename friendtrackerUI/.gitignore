@@ -1,0 +1,17 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+arm/o.le-v7-g/*
+arm/o.le-v7-g/friendtrackerUI
+translations/friendtrackerUI.ts
