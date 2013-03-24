@@ -35,13 +35,13 @@ function startSubscription(friends, map) {
     socket.onopen = function() {
     	var i, _i, _results;
     	// first get locations and then subscribe for later
-    	for (i = _i = 1; _i <= friends.length; i = ++_i) {
+    	for (i = _i = 0; _i < friends.length; i = ++_i) {
     		socket.send(JSON.stringify({
     			"GET": friends[i]
             }));
     	}
     	_results = [];
-    	for (i = _i = 1; _i <= friends.length; i = ++_i) {
+    	for (i = _i = 0; _i < friends.length; i = ++_i) {
     		_results.push(socket.send(JSON.stringify({
     			"SUBSCRIBE": friends[i]
     		})));

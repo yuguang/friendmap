@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include "Message.h"
 #include "Reply.h"
+#include <QStringList>
 
 class ServerInterface : public QObject
 {
@@ -26,7 +27,8 @@ public:
 	void receiveMessage() const;
 
 signals:
-	void loginSuccess(const QString& sessionKey);
+	void onSessionKeyChanged(const QString& sessionKey);
+	void onFriendListChanged(const QStringList &);
 
 public slots:
 	void parseReply(QNetworkReply* );

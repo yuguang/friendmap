@@ -28,7 +28,7 @@ bool LoginReply::parse(const QByteArray& data)
 			m_sessionKey = map["sessionKey"].toString();
 			QVariantList friendList = map["friends"].value<QVariantList>();
 			for (int i = 0; i < friendList.size(); i++) {
-				m_friends.push_back(friendList[i].toString());
+				m_ppIds.append(friendList[i].toString());
 			}
 
 			return true;
@@ -49,7 +49,7 @@ QString LoginReply::getSessionKey() const
 	return m_sessionKey;
 }
 
-vector<QString> LoginReply::getFriends() const
+QStringList LoginReply::getFriends() const
 {
-	return m_friends;
+	return m_ppIds;
 }

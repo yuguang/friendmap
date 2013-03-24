@@ -21,7 +21,7 @@ LoginMessage::LoginMessage(const QString& ppId,
 LoginMessage::LoginMessage(const QString& ppId,
 						   double lat,
 						   double lon,
-						   const vector<QString>& friends)
+						   const QStringList& friends)
 : m_ppId(ppId), latitude(lat), longitude(lon), friends(friends)
 {}
 
@@ -35,7 +35,7 @@ QByteArray LoginMessage::serialize() const
 
 	for (unsigned int i = 0; i < friends.size(); i++) {
 		if (i > 0) jsonStream << ",";
-		jsonStream << "\"" << friends[i].toStdString() << "\"";
+		jsonStream << "\"" << friends.at(i).toStdString() << "\"";
 	}
 
 	jsonStream << "]}";

@@ -17,37 +17,38 @@
 <html>
     <head>
         <title>Maps Sample</title>
+        <link rel="stylesheet" href="local:///assets/style.css" type="text/css" media="screen" />
 
-		<script src="lib.js"></script>
-        <script src="bing_map.js"></script>
+		<script src="local:///assets/lib.js"></script>
+        <script src="$$SCRIPT_FILE$$"></script>
 
-        <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=en-gb"></script>
+        <script src="$$MAP_URL$$"></script>
 
         <script type="text/javascript">
             function load(){
-                initMaps(43.465187, -80.522372);
+                initMaps($$INIT_LAT$$, $$INIT_LNG$$);
             }
         </script>
-
-	<style type="text/css">
+        
+        <style type="text/css">
         .blackText div {
-            color: black !important;
+        	color: black !important;
         }
         a.blackText {
-            background-image: url("http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/48x48/pin_map.png");
-            background-repeat: no-repeat;
+        	background-image: url("local:///assets/images/Map_pin2.png");
+        	background-repeat: no-repeat;
         }
-        a.blackText img{
-            margin-left: 12px;
-            margin-top: 6px;
-            padding:1px;
-            border:1px solid #f5f5dc;
-            background-color:#021a40;
-            -webkit-border-radius: 2px;
-            -moz-border-radius: 2px;
-            border-radius: 2px;
+        a.blackText img {
+        	margin-left: 30px;
+        	margin-top: 22px;
+        	padding: 1px;
+        	border: 1px solid: #f5f5dc;
+        	background-color: #021a40;
+        	-webkit-border-radius: 2px;
+        	-moz-border-radius: 2px;
+        	border-radius: 15px;
         }
-	</style>
+		</style>
     </head>
     <body onload="load()">
         <div id="map_canvas"></div>

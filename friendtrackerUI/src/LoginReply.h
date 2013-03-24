@@ -10,7 +10,7 @@
 
 #include <QString>
 #include <QByteArray>
-#include <vector>
+#include <QStringList>
 #include "Reply.h"
 
 class LoginReply : public Reply
@@ -20,12 +20,12 @@ public:
 	QString getType() const;
 
 	QString getSessionKey() const;
-	std::vector<QString> getFriends() const;
+	QStringList getFriends() const;
 
 private:
 	bool m_status;
 	QString m_sessionKey;
-	std::vector<QString> m_friends;
+	QStringList m_ppIds;
 };
 
 #endif /* LOGINREPLY_H_ */

@@ -18,6 +18,7 @@
 var googleMap;
 var bingMap;
 var markersArray = [];
+var friends = [];
 
 // pushpin for the user
 var mypin;
@@ -45,36 +46,42 @@ function initMaps(lat, lng) {
 
     Microsoft.Maps.Events.addHandler(bingMap, 'viewchange', centerChanged);
     Microsoft.Maps.Events.addHandler(bingMap, 'click', clicked);
-
+    
     // put pushpin for the user
-    userImages = {"testusr1": "http://placekitten.com/24/24", "testusr2": "http://placekitten.com/24/24", "testusr3": "http://placekitten.com/24/24", "testusr4": "http://placekitten.com/24/24", "testusr5": "http://placekitten.com/24/24", "testusr6": "http://placekitten.com/24/24"}
-
-    myUserId = "testusr1"
-    createPushPin(myLat, myLong, myUserId, userImages[myUserId])
-
-    var friends = ["testusr1", "testusr2", "testusr3", "testusr4", "testusr5", "testusr6"];
-    startSubscription(friends, this);
-
+    /*var iconpath = "local:///assets/images/pin.png";
+    mypin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(myLat, myLong),{
+    	icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: false});
+    bingMap.entities.push(mypin);*/
+    createPushPin(myLat, myLong, "Me", "local:///assets/images/kitten48.jpg");
+    Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
+    
     console.log("Done init BingMaps");
+}
+
+function addOnlineFriend(friend) {
+	friends.push(friend);
+}
+
+function subscribe() {
+	startSubscription(friends, this);
 }
 
 function plot(data) {
 	if (data.user in friendsPins) {
-		updatePushPin(data.location.x, data.location.y, data.user, userImages[data.user]);
+		updatePushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");
 	} else {
-    // username console.log(data.user)
-		createPushPin(data.location.x, data.location.y, data.user, userImages[data.user]);
+		createPushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");	
 	}
 }
 
 function clicked(e) {
     var location = bingMap.tryPixelToLocation(new Microsoft.Maps.Point(e.getX(), e.getY()), Microsoft.Maps.PixelReference.page);
-    //navigator.cascades.postMessage("clicked:" + location.latitude + "," + location.longitude + "," + e.pageX + "," + e.pageY);
+    navigator.cascades.postMessage("clicked:" + location.latitude + "," + location.longitude + "," + e.pageX + "," + e.pageY);
 }
 
 function centerChanged() {
     var point = bingMap.tryLocationToPixel(bingMap.getCenter(), Microsoft.Maps.PixelReference.page);
-    //navigator.cascades.postMessage("centerChanged:" + bingMap.getCenter().latitude + "," + bingMap.getCenter().longitude + "," + point.x + "," + point.y);
+    navigator.cascades.postMessage("centerChanged:" + bingMap.getCenter().latitude + "," + bingMap.getCenter().longitude + "," + point.x + "," + point.y);
 
 }
 
@@ -109,22 +116,19 @@ function setMapTypeId(mapType) {
 // create a marker / push-pin
 function createPushPin(lat, lon, title, iconpath) {
     var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {
-        text: title,
-        textOffset: new Microsoft.Maps.Point(20, 10),
-        width: 125,
-        typeName: 'blackText',
-        icon: iconpath,
-        height: 60,
-        anchor: new Microsoft.Maps.Point(20, 50),
-        draggable: true
+    	text: title,
+    	textOffset: new Microsoft.Maps.Point(-12, 6),
+    	width: 128,
+    	typeName: 'blackText',
+    	icon:iconpath,
+    	height:128,
+    	anchor:new Microsoft.Maps.Point(20,50),
+    	draggable: true
     });
     bingMap.entities.push(pin);
     Microsoft.Maps.Events.addHandler(pin, 'click', markerClicked);
     markersArray.push(pin);
     friendsPins[title] = pin;
-
-    //Remove: set center on user
-//    setCenter(lat, lon);
 }
 
 function updatePushPin(lat, lon, title) {

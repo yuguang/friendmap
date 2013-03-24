@@ -74,7 +74,8 @@ void ServerInterface::parseReply(QNetworkReply* reply)
 			bool result = reply->parse(bytes);
 			if (result) {
 				if (reply->getType() == "login") {
-					emit loginSuccess(dynamic_cast<LoginReply *>(reply)->getSessionKey());
+					emit onSessionKeyChanged(dynamic_cast<LoginReply *>(reply)->getSessionKey());
+					emit onFriendListChanged(dynamic_cast<LoginReply *>(reply)->getFriends());
 				}
 			}
 			Q_UNUSED(result);
