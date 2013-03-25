@@ -117,7 +117,7 @@ function createPushPin(lat, lon, title, iconpath) {
     	typeName: 'blackText',
     	icon:iconpath,
     	height:128*4,
-    	anchor:new Microsoft.Maps.Point(142,310),
+    	anchor:new Microsoft.Maps.Point(14,31),
     	draggable: false
     });
     bingMap.entities.push(pin);
