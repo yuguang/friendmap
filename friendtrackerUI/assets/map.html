@@ -18,8 +18,7 @@
     <head>
         <title>Maps Sample</title>
         <meta name="viewport" content="width=device-width">
-
-		<script src="local:///assets/lib.js"></script>
+        <script src="local:///assets/lib.js"></script>
         <script src="$$SCRIPT_FILE$$"></script>
 
         <script src="$$MAP_URL$$"></script>
@@ -28,25 +27,42 @@
             function load(){
                 initMaps($$INIT_LAT$$, $$INIT_LNG$$);
             }
+            placeholderImage = "local:///assets/images/kitten48.jpg";
         </script>
-        
+
+        <!--
+
+		<script src="lib.js"></script>
+        <script src="bing_map.js"></script>
+
+        <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=en-gb"></script>
+
+        <script type="text/javascript">
+            function load(){
+                initMaps(43.465187, -80.522372);
+            }
+//            placeholderImage = "local:///assets/images/kitten48.jpg";
+            placeholderImage = "http://placekitten.com/168/168";
+        </script>
+-->
+
         <style type="text/css">
         .blackText div {
         	color: black !important;
         }
         a.blackText {
-        	background-image: url("local:///assets/images/pin_map.png");
+            background-image: url("images/Map_pin1.png?v=4");
         	background-repeat: no-repeat;
         }
-        a.blackText img {
-        	margin-left: 30px;
-        	margin-top: 22px;
-        	padding: 1px;
-        	border: 1px solid: #f5f5dc;
-        	background-color: #021a40;
-        	-webkit-border-radius: 2px;
-        	-moz-border-radius: 2px;
-        	border-radius: 15px;
+        a.blackText img{
+            margin-left: 65px;
+            margin-top: 50px;
+            padding:1px;
+            border:1px solid #f5f5dc;
+            background-color:#021a40;
+            -webkit-border-radius: 32px;
+            -moz-border-radius: 32px;
+            border-radius: 32px;
         }
 		</style>
     </head>

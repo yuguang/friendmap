@@ -48,13 +48,9 @@ function initMaps(lat, lng) {
     Microsoft.Maps.Events.addHandler(bingMap, 'click', clicked);
     
     // put pushpin for the user
-    /*var iconpath = "local:///assets/images/pin.png";
-    mypin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(myLat, myLong),{
-    	icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: false});
-    bingMap.entities.push(mypin);*/
-    createPushPin(myLat, myLong, "Me", "local:///assets/images/kitten48.jpg");
+    createPushPin(myLat, myLong, "Me", placeholderImage);
     Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
-    
+
     console.log("Done init BingMaps");
 }
 
@@ -68,9 +64,9 @@ function subscribe() {
 
 function plot(data) {
 	if (data.user in friendsPins) {
-		updatePushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");
+		updatePushPin(data.location.x, data.location.y, data.user, placeholderImage);
 	} else {
-		createPushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");	
+		createPushPin(data.location.x, data.location.y, data.user, placeholderImage);
 	}
 }
 
@@ -117,12 +113,11 @@ function setMapTypeId(mapType) {
 function createPushPin(lat, lon, title, iconpath) {
     var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {
     	text: title,
-    	textOffset: new Microsoft.Maps.Point(-12, 6),
-    	width: 128,
+    	width: 128*4,
     	typeName: 'blackText',
     	icon:iconpath,
-    	height:128,
-    	anchor:new Microsoft.Maps.Point(20,50),
+    	height:128*4,
+    	anchor:new Microsoft.Maps.Point(142,310),
     	draggable: false
     });
     bingMap.entities.push(pin);
