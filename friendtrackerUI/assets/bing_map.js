@@ -123,7 +123,7 @@ function createPushPin(lat, lon, title, iconpath) {
     	icon:iconpath,
     	height:128,
     	anchor:new Microsoft.Maps.Point(20,50),
-    	draggable: true
+    	draggable: false
     });
     bingMap.entities.push(pin);
     Microsoft.Maps.Events.addHandler(pin, 'click', markerClicked);
