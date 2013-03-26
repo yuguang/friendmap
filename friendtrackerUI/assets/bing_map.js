@@ -19,6 +19,7 @@ var googleMap;
 var bingMap;
 var markersArray = [];
 var friends = [];
+var websocket = null;
 
 // pushpin for the user
 var mypin;
@@ -52,7 +53,7 @@ function initMaps(lat, lng) {
     mypin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(myLat, myLong),{
     	icon:iconpath, height:60, width:60, anchor:new Microsoft.Maps.Point(20,58), draggable: false});
     bingMap.entities.push(mypin);*/
-    createPushPin(myLat, myLong, "Me", "local:///assets/images/kitten48.jpg");
+    createPushPin(myLat, myLong, "Me", placeholderImage);
     Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
     
     console.log("Done init BingMaps");
@@ -63,14 +64,18 @@ function addOnlineFriend(friend) {
 }
 
 function subscribe() {
-	startSubscription(friends, this);
+	websocket = startSubscription(friends, this);
+}
+
+function unsubscribe() {
+	endSubscription(friends, websocket);
 }
 
 function plot(data) {
 	if (data.user in friendsPins) {
-		updatePushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");
+		updatePushPin(data.location.x, data.location.y, data.user, placeholderImage);
 	} else {
-		createPushPin(data.location.x, data.location.y, data.user, "local:///assets/images/kitten48.jpg");	
+		createPushPin(data.location.x, data.location.y, data.user, placeholderImage);	
 	}
 }
 
@@ -122,7 +127,8 @@ function createPushPin(lat, lon, title, iconpath) {
     	typeName: 'blackText',
     	icon:iconpath,
     	height:128,
-    	anchor:new Microsoft.Maps.Point(20,50),
+    	anchor:new Microsoft.Maps.Point(14,31),
+    	//anchor:new Microsoft.Maps.Point(142,310),
     	draggable: false
     });
     bingMap.entities.push(pin);

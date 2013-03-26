@@ -6,15 +6,17 @@ NavigationPane {
     id: navigationPane
     Menu.definition: MenuDefinition {
         // help action
-        actions: [
-            ActionItem {
-            	title: "Info"
-            	imageSource: "images/ic_info.png"
-            	onTriggered: {
-                	infoSheet.open();
-                }
+        helpAction: HelpActionItem {
+        	onTriggered: {
+                navigationPane.push(infoPage);
             }
-        ]
+            attachedObjects: [
+                ComponentDefinition {
+                    id: infoPage
+                    source: "info.qml"
+                }
+            ]
+        }
 
         // settings action
         settingsAction: SettingsActionItem {
@@ -24,11 +26,6 @@ NavigationPane {
             }
     	}
     }
-    
-    onPopTransitionEnded: {
-    	page.destroy();        
-    }
-    
     Page {
         actions: [
             ActionItem {
@@ -105,14 +102,6 @@ NavigationPane {
                 var script = "subscribe()";
                 qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
             }
-            function unsubscribe() {
-                var script = "unsubscribe()"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function updateLocation(ppId, x, y, visibility) {
-                var script = "updatePushPin(" + x + ", " + y + ", \"" + ppId + "\")";
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
             //! [1]
             
             ScrollView {
@@ -128,20 +117,13 @@ NavigationPane {
                     html: _mapView.pageContent
                 //! [2]
                 
-                	onCreationCompleted: {
-                	    // connect to subscribe/unsubscribe signals from WebMaps
-                        _mapView.subscribe.connect(map.subscribe);
-                        _mapView.unsubscribe.connect(map.unsubscribe);
-                        _mapView.friendLocationChanged.connect(map.updateLocation);
-                    }
-                
                 	onLoadingChanged: {
                 	    if (loadRequest.status == WebLoadStatus.Succeeded) {
                 	    	for (var i = 0; i < _friendtracker.onlinePpIds.length; i++) {
                 	        	map.addOnlineFriend(_friendtracker.onlinePpIds[i]);
                 	        }
                 	    	map.subscribe();
-                	    }                	                    	
+                	    }
                 	}
             
                     onMinContentScaleChanged: {
@@ -233,15 +215,6 @@ NavigationPane {
         ComponentDefinition {
             id: settingsPage
             source: "settings.qml"
-        },
-        Sheet {
-            id: infoSheet
-            Info {
-            	id: infoPage
-                onDone: {
-                    infoSheet.close();
-                }
-            }
         }
     ]
 }

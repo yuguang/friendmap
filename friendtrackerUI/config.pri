@@ -10,6 +10,8 @@ device {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
@@ -22,6 +24,8 @@ device {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.h) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \
@@ -43,6 +47,8 @@ device {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
@@ -55,6 +61,8 @@ device {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.h) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \
@@ -78,6 +86,8 @@ simulator {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
@@ -90,6 +100,8 @@ simulator {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetLocationsMessage.h) \
+                 $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \

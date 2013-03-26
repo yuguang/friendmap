@@ -106,6 +106,7 @@ QString Settings::statusMessage()
  */
 void Settings::setStatusMessage(const QString& statusMessage)
 {
+	cout << "STATUS CHANGED " << statusMessage.toStdString() << endl;
 	bool result = false;
 	if (statusMessage == "Busy") {
 		result = m_userProfile->requestUpdateStatus(bbm::UserStatus::Busy, statusMessage);

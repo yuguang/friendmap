@@ -13,8 +13,11 @@
 #include <bb/pim/contacts/ContactListFilters>
 #include <bb/system/SystemToast>
 
+#include <QSettings>
+
 #include "LoginMessage.h"
 #include "UpdateLocationMessage.h"
+#include "GetLocationsMessage.h"
 #include "ServerInterface.h"
 
 #include <iostream>
@@ -35,6 +38,8 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 , m_sessionKey("")
 , m_serverInterface(new ServerInterface(this))
 , m_settings(new Settings(this, m_regHandler))
+, m_regularModeTimer(new QTimer(this))
+, m_visibility(1)
 
 {
 	// get user profile when bbm registration succeeds
@@ -78,6 +83,18 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 			this,
 			SLOT(endApplication()));
 	Q_ASSERT(connected);
+
+	connected = QObject::connect(m_serverInterface,
+			SIGNAL(onGetLocations(const QList<User> &)),
+			this,
+			SLOT(updateFriendsLocation(const QList<User> &)));
+	Q_ASSERT(connected);
+
+    // Connect timer with pull location function to prepare for the regular mode
+    connected = connect(m_regularModeTimer, SIGNAL(timeout()),
+    		this,
+    		SLOT(pullLocations()));
+    Q_ASSERT(connected);
 	Q_UNUSED(connected);
 }
 
@@ -125,9 +142,54 @@ void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
 	UpdateLocationMessage msg(m_profile->ppId(),
 			coord.latitude(),
 			coord.longitude(),
+			m_visibility,
 			m_sessionKey);
 
 	m_serverInterface->sendMessage(msg);
+}
+
+/*
+ * Start the regular mode timer (for every timeout, update the user's location)
+ */
+void FriendtrackerUI::setRegularMode(double frequency)
+{
+	m_regularModeTimer->start((int)frequency * 1000);
+	m_webMaps->setRegularMode();
+}
+
+/*
+ * Stop the regular mode timer.
+ */
+void FriendtrackerUI::setRealtimeMode()
+{
+	m_regularModeTimer->stop();
+	m_webMaps->setRealtimeMode();
+}
+
+void FriendtrackerUI::setVisibility(bool visibility)
+{
+	m_visibility = (visibility ? 1 : 0);
+}
+
+/*
+ * Sends GET msgs for all of user's friends from Redis.
+ * Pass locations to WebView control for updating the map.
+ */
+void FriendtrackerUI::pullLocations()
+{
+	GetLocationsMessage msg(m_ppIds);
+	m_serverInterface->sendMessage(msg);
+}
+
+/*
+ * Notifies WebMaps class of the user's friends location updates
+ */
+void FriendtrackerUI::updateFriendsLocation(const QList<User>& friends)
+{
+	for (int i = 0; i < friends.size(); i++) {
+		const User& user = friends.at(i);
+		m_webMaps->updateFriendLocation(user.ppId, user.x, user.y, user.visibility);
+	}
 }
 
 void FriendtrackerUI::initWebMaps()
@@ -189,4 +251,24 @@ void FriendtrackerUI::initUserProfile()
 	}*/
 
 	emit userProfileInitialized();
+}
+
+QString FriendtrackerUI::getValueFor(const QString &objectName, const QString &defaultValue)
+{
+    QSettings settings;
+
+    // If no value has been saved, return the default value.
+    if (settings.value(objectName).isNull()) {
+        return defaultValue;
+    }
+
+    // Otherwise, return the value stored in the settings object.
+    return settings.value(objectName).toString();
+}
+
+void FriendtrackerUI::saveValueFor(const QString &objectName, const QString &inputValue)
+{
+    // A new value is saved to the application settings object.
+    QSettings settings;
+    settings.setValue(objectName, QVariant(inputValue));
 }

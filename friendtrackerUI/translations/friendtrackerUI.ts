@@ -62,57 +62,57 @@
 <context>
     <name>WebMaps</name>
     <message>
-        <location filename="../src/WebMaps.cpp" line="53"/>
+        <location filename="../src/WebMaps.cpp" line="48"/>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="59"/>
+        <location filename="../src/WebMaps.cpp" line="54"/>
         <source>Aerial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="65"/>
+        <location filename="../src/WebMaps.cpp" line="60"/>
         <source>Birds Eye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="71"/>
+        <location filename="../src/WebMaps.cpp" line="66"/>
         <source>Collins Bart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="77"/>
+        <location filename="../src/WebMaps.cpp" line="72"/>
         <source>Mercator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="83"/>
+        <location filename="../src/WebMaps.cpp" line="78"/>
         <source>Ordnance Survey</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="89"/>
+        <location filename="../src/WebMaps.cpp" line="84"/>
         <source>Road</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="107"/>
+        <location filename="../src/WebMaps.cpp" line="102"/>
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="154"/>
+        <location filename="../src/WebMaps.cpp" line="198"/>
         <source>Initializing Bing Maps...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="155"/>
+        <location filename="../src/WebMaps.cpp" line="199"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WebMaps.cpp" line="293"/>
+        <location filename="../src/WebMaps.cpp" line="337"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -120,21 +120,21 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../assets/main.qml" line="150"/>
+        <location filename="../assets/main.qml" line="167"/>
         <source>centerChanged:
 World: %1, %2
 Pixel: %3, %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="162"/>
+        <location filename="../assets/main.qml" line="179"/>
         <source>clicked:
 World: %1, %2
 Pixel: %3, %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="174"/>
+        <location filename="../assets/main.qml" line="191"/>
         <source>markerClicked:
 World: %1, %2
 Pixel: %3, %4</source>
@@ -151,6 +151,19 @@ Pixel: %3, %4</source>
     <message>
         <location filename="../assets/registration.qml" line="66"/>
         <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>settings</name>
+    <message>
+        <location filename="../assets/settings.qml" line="41"/>
+        <source>Profile Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="281"/>
+        <source>Server Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

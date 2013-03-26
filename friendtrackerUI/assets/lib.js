@@ -48,10 +48,24 @@ function startSubscription(friends, map) {
     	}
     	return _results;
     };
-    return socket.onmessage = function(message) {
+    socket.onmessage = function(message) {
     	var data = decodeJSON(message);
     	if (data) {
     		return map.plot(data);
     	}
     };
+    
+    return socket;
 };
+
+/**
+ * sends unsubscribe messages to all subscriptions
+ */
+function endSubscription(friends, websocket) {
+	console.log("end subscription");
+	for (var i = 0; i < friends.length; i++) {
+		var msg = JSON.stringify({"UNSUBSCRIBE": friends[i]});
+		console.log("MSG: " + msg);
+		websocket.send(msg);
+	}
+}

@@ -3,10 +3,14 @@
 #define FriendtrackerUI_HPP_
 
 #include <QObject>
+#include <QList>
+#include <QTimer>
 #include <bb/platform/bbm/UserProfile>
 #include "WebMaps.hpp"
 #include "RegistrationHandler.hpp"
 #include "Settings.hpp"
+
+#include "GetLocationsReply.h"
 
 #include <QtLocationSubset/QGeoCoordinate>
 
@@ -28,6 +32,12 @@ public:
     FriendtrackerUI(bb::cascades::Application *app, const QString& uuid);
     virtual ~FriendtrackerUI() {}
 
+    Q_INVOKABLE void setRegularMode(double frequency);
+    Q_INVOKABLE void setRealtimeMode();
+    Q_INVOKABLE void setVisibility(bool);
+    Q_INVOKABLE QString getValueFor(const QString &, const QString &);
+    Q_INVOKABLE void saveValueFor(const QString &, const QString &);
+
 signals:
 	void userProfileInitialized();
 	void onlinePpIdsChanged(const QStringList& ppIds);
@@ -44,6 +54,8 @@ public Q_SLOTS:
 	void endApplication();
 	QStringList onlinePpIds();
 	void setOnlinePpIds(const QStringList& ppIds);
+	void pullLocations();
+	void updateFriendsLocation(const QList<User> &);
 
 private:
 	bb::cascades::Application* m_app;
@@ -56,6 +68,8 @@ private:
 	Settings* m_settings;
 	QStringList m_ppIds;
 	QStringList m_onlinePpIds;
+	QTimer* m_regularModeTimer;
+	int m_visibility;
 };
 
 #endif /* FriendtrackerUI_HPP_ */

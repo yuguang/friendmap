@@ -15,6 +15,7 @@
 
 #include "LoginReply.h"
 #include "UpdateLocationReply.h"
+#include "GetLocationsReply.h"
 
 using namespace std;
 using namespace bb::data;
@@ -23,6 +24,7 @@ using namespace bb::system;
 ServerInterface::ServerInterface(QObject* parent)
 : QObject(parent)
 , m_NetworkAccessManager(new QNetworkAccessManager(parent))
+, m_isLoggedIn(false)
 {
 	bool connected = connect(m_NetworkAccessManager,
 			SIGNAL(finished(QNetworkReply* )),
@@ -61,6 +63,8 @@ Reply* ServerInterface::buildReply(const QByteArray& data)
 			return new LoginReply();
 		} else if (map["type"].toString() == "update") {
 			return new UpdateLocationReply();
+		} else if (map["type"].toString() == "location") {
+			return new GetLocationsReply();
 		} else {
 			return 0;
 		}
@@ -79,6 +83,9 @@ void ServerInterface::parseReply(QNetworkReply* reply)
 				if (reply->getType() == "login") {
 					emit onSessionKeyChanged(dynamic_cast<LoginReply *>(reply)->getSessionKey());
 					emit onFriendListChanged(dynamic_cast<LoginReply *>(reply)->getFriends());
+					m_isLoggedIn = true;
+				} else if (reply->getType() == "location") {
+					emit onGetLocations(dynamic_cast<GetLocationsReply *>(reply)->getFriends());
 				}
 			} else {
 				if (reply->getType() == "login") {
@@ -94,6 +101,12 @@ void ServerInterface::parseReply(QNetworkReply* reply)
 			cout << "parse error" << endl;
 		}
 	} else {
-		cout << "error!: " << reply->error() << endl;
+		SystemToast toast;
+		toast.setBody(reply->errorString());
+		toast.exec();
+		if (!m_isLoggedIn) {
+			// kill application here
+			emit loginFailed();
+		}
 	}
 }

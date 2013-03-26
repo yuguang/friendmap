@@ -19,11 +19,12 @@ class UpdateLocationMessage : public Message
 	double latitude;
 	double longitude;
 	QString m_sessionKey;
+	int m_visibility;
 
 	static QUrl url;
 
 public:
-	UpdateLocationMessage(const QString& ppId, double lat, double lon, const QString& sessionKey);
+	UpdateLocationMessage(const QString& ppId, double lat, double lon, int visibility, const QString& sessionKey);
 
 	QByteArray serialize() const;
 	QUrl getUrl() const;

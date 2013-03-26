@@ -66,6 +66,11 @@ public:
 
     double getMyLatitude() const;
     double getMyLongitude() const;
+    void setRegularMode();
+    void setRealtimeMode();
+    void updateFriendLocation(const QString &, double, double, int);
+
+    Q_INVOKABLE void setGeoLocationInterval(float value);
 
 public slots:
     void nextViewMode();
@@ -80,6 +85,9 @@ signals:
     void viewModeChanged();
     void gotMyLocation(const QGeoCoordinate& coord);
     void myLocationChanged(const QGeoCoordinate& coord);
+    void subscribe();
+    void unsubscribe();
+    void friendLocationChanged(const QString& ppId, double x, double y, int visibility);
 
 private:
 

@@ -1,29 +1,24 @@
-/* Copyright (c) 2013 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+/**
+ * Friendtracker UI
+ *
+ * This is a mediator class managing many different parts of the Friendtracker App.
+ * Written By: Sukwon Oh, Bill Chen
+ */
 #include "WebMaps.hpp"
 
 #include <QDebug>
 #include <QFile>
+#include <QTimer>
 
 #include <bb/location/PositionErrorCode>
 #include <bb/system/InvokeManager>
 #include <bb/system/InvokeRequest>
 #include <bb/system/InvokeTarget>
 #include <bb/system/InvokeTargetReply>
+#include <bb/system/SystemToast>
 
 #include <iostream>
+#include <sstream>
 
 using namespace bb::system;
 using namespace QtMobilitySubset;
@@ -144,6 +139,55 @@ void WebMaps::setCurrentProvider(Provider provider)
     emit viewModeChanged();
 }
 //! [3]
+
+/*
+ * Update GeoLocation update interval to the user specified value
+ */
+void WebMaps::setGeoLocationInterval(float value)
+{
+	if (m_positionInfoSource) {
+		SystemToast toast;
+		stringstream ss;
+		ss << "Location Update Interval changed to "
+				<< (int)value << " seconds";
+		toast.setBody(ss.str().c_str());
+		toast.exec();
+		m_positionInfoSource->setUpdateInterval((int)value * 1000);
+	}
+}
+
+/**
+ * First, unsubscribe to all subscriptions to friends.
+ * Next, start the regular mode timer with user specified frequency.
+ */
+void WebMaps::setRegularMode()
+{
+	// unsubscribe all friends
+	cout << "unsubscribing..." << endl;
+	emit unsubscribe();
+}
+
+/*
+ * First, subscribe to all subscriptions to friends.
+ * Next, stop the regular mode timer.
+ */
+void WebMaps::setRealtimeMode()
+{
+	// subscribe to all friends
+	cout << "subscribing..." << endl;
+	emit subscribe();
+}
+
+/*
+ * Signals the WebView control that the location of a friend is updated
+ */
+void WebMaps::updateFriendLocation(const QString& ppId, double x, double y, int visibility)
+{
+	if (visibility) {
+		cout << "Update " << ppId.toStdString() << " x: " << x << " y: " << y << " v: " << visibility << endl;
+		emit friendLocationChanged(ppId, x, y, visibility);
+	}
+}
 
 //! [4]
 QString WebMaps::pageContent() const

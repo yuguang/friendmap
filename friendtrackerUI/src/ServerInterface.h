@@ -15,6 +15,9 @@
 #include "Message.h"
 #include "Reply.h"
 #include <QStringList>
+#include <QList>
+
+#include "GetLocationsReply.h"
 
 class ServerInterface : public QObject
 {
@@ -29,6 +32,7 @@ public:
 signals:
 	void onSessionKeyChanged(const QString& sessionKey);
 	void onFriendListChanged(const QStringList &);
+	void onGetLocations(const QList<User> &);
 	void loginFailed();
 
 public slots:
@@ -37,6 +41,7 @@ public slots:
 private:
 	Reply* buildReply(const QByteArray &);
 	QNetworkAccessManager* m_NetworkAccessManager;
+	bool m_isLoggedIn;
 };
 
 
