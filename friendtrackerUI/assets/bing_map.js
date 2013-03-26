@@ -55,7 +55,7 @@ function initMaps(lat, lng) {
     bingMap.entities.push(mypin);*/
     createPushPin(myLat, myLong, "Me", placeholderImage);
     Microsoft.Maps.Events.addHandler(mypin, 'click', markerClicked);
-    
+
     console.log("Done init BingMaps");
 }
 
@@ -122,8 +122,7 @@ function setMapTypeId(mapType) {
 function createPushPin(lat, lon, title, iconpath) {
     var pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lat, lon), {
     	text: title,
-    	textOffset: new Microsoft.Maps.Point(-12, 6),
-    	width: 128,
+    	width: 128*4,
     	typeName: 'blackText',
     	icon:iconpath,
     	height:128,
