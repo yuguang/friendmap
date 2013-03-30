@@ -17,9 +17,19 @@
 #include <bb/system/InvokeTargetReply>
 #include <bb/system/SystemToast>
 
+#include <bb/cascades/Container>
+#include <bb/cascades/maps/MapView>
+#include <bb/platform/geo/Point.hpp>
+#include <QPoint>
+
 #include <iostream>
 #include <sstream>
 
+#include "Exceptions.h"
+
+using namespace bb::cascades;
+using namespace bb::cascades::maps;
+using namespace bb::platform::geo;
 using namespace bb::system;
 using namespace QtMobilitySubset;
 using namespace std;
@@ -27,118 +37,100 @@ using namespace std;
 //! [0]
 WebMaps::WebMaps(QObject *parent)
     : QObject(parent)
-    , m_currentProvider(BingMaps)
-    , m_currentViewModeIndex(0)
 	, m_positionInfoSource(QGeoPositionInfoSource::createDefaultSource(parent))
 	, m_ProgressDialog(new SystemProgressDialog(this))
 	, initialized(false)
 {
+	m_ProgressDialog->setState(SystemUiProgressState::Active);
+	m_ProgressDialog->setEmoticonsEnabled(true);
+	m_ProgressDialog->setTitle(tr("Initializing Friend Tracker..."));
+	m_ProgressDialog->cancelButton()->setLabel(tr("Cancel"));
+	m_ProgressDialog->confirmButton()->setLabel(QString::null);
 
-//! [0]
+	// Start getting current location
+	if (m_positionInfoSource == 0) {
+		SystemToast toast;
+		toast.setBody("Failed to get current location! Exiting...");
+		toast.exec();
+		throw InitializationException("Failed to get current location");
+	}
+	m_positionInfoSource->setProperty("accuracy", 2.0);	// set accuracy within 2m
+}
 
-    // Bing Maps
-    {
-        QVariantMap entry;
-        entry["scriptFile"] = QLatin1String("local:///assets/bing_map.js");
-        entry["mapUrl"] = QLatin1String("http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=en-gb");
+void WebMaps::init()
+{
+	bool updateTimeoutConnected = connect(m_positionInfoSource,
+			SIGNAL(updateTimeout()),
+	    	this,
+	    	SLOT(positionUpdateTimeout()));
+	Q_ASSERT(updateTimeoutConnected);
+	Q_UNUSED(updateTimeoutConnected);
 
-        QVariantList viewModes;
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Auto");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.auto");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Aerial");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.aerial");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Birds Eye");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.birdsEye");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Collins Bart");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.collinsBart");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Mercator");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.mercator");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Ordnance Survey");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.ordnanceSurvey");
-            viewModes << viewMode;
-        }
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Road");
-            viewMode["mapType"] = QLatin1String("Microsoft.Maps.MapTypeId.road");
-            viewModes << viewMode;
-        }
-        entry["viewModes"] = viewModes;
+	bool positionUpdatedConnected = connect(m_positionInfoSource,
+			SIGNAL(positionUpdated(const QGeoPositionInfo &)),
+			this,
+	    	SLOT(positionUpdatedHandler(const QGeoPositionInfo &)));
+	Q_ASSERT(positionUpdatedConnected);
+	Q_UNUSED(positionUpdatedConnected);
 
-        m_providerData.insert(BingMaps, entry);
-    }
+	m_positionInfoSource->startUpdates();		// start get my location event loop
 
-    // OpenLayers
-    {
-        QVariantMap entry;
-        entry["scriptFile"] = QLatin1String("local:///assets/openlayers_map.js");
-        entry["mapUrl"] = QLatin1String("http://openlayers.org/api/OpenLayers.js");
+	m_ProgressDialog->setBody("getting current location...");
+	m_ProgressDialog->setProgress(60);
 
-        QVariantList viewModes;
-        {
-            QVariantMap viewMode;
-            viewMode["title"] = tr("Default");
-            viewMode["mapType"] = QLatin1String("dummy");
-            viewModes << viewMode;
-        }
-        entry["viewModes"] = viewModes;
+	SystemUiResult::Type result = m_ProgressDialog->exec();
+	if (result != SystemUiResult::ConfirmButtonSelection) {
+	    cout << "initialization error!" << endl;
+	    throw InitializationException("Initialization canceled by user");
+	}
+}
 
-        m_providerData.insert(OpenLayers, entry);
+QVariantList WebMaps::worldToPixelInvokable(QObject* mapObject, double lat, double lon) const
+{
+    MapView* mapview = qobject_cast<MapView*>(mapObject);
+    const Point worldCoordinates = Point(lat, lon);
+    const QPoint pixels = mapview->worldToWindow(worldCoordinates);
+
+    return QVariantList() << pixels.x() << pixels.y();
+}
+
+void WebMaps::updateMarkers(QObject* mapObject, QObject* containerObject) const
+{
+    MapView* mapview = qobject_cast<MapView*>(mapObject);
+    Container* container = qobject_cast<Container*>(containerObject);
+
+    for (int i = 0; i < container->count(); i++) {
+        const QPoint xy = worldToPixel(mapview,
+                                       container->at(i)->property("lat").value<double>(),
+                                       container->at(i)->property("lon").value<double>());
+        container->at(i)->setProperty("x", xy.x());
+        container->at(i)->setProperty("y", xy.y());
     }
 }
 
-//! [2]
-void WebMaps::nextViewMode()
+void WebMaps::addPin(const QString& ppId, QObject* pinObject)
 {
-    const QVariantMap &entry = m_providerData[m_currentProvider];
-    const QVariantList viewModes = entry["viewModes"].toList();
-
-    m_currentViewModeIndex = ((m_currentViewModeIndex + 1) % viewModes.count());
-
-    emit viewModeChanged();
-}
-//! [2]
-
-WebMaps::Provider WebMaps::currentProvider() const
-{
-    return m_currentProvider;
+	m_pinMap.insert(ppId, pinObject);
 }
 
-//! [3]
-void WebMaps::setCurrentProvider(Provider provider)
+QObject* WebMaps::getPin(const QString& ppId) const
 {
-    if (m_currentProvider == provider)
-        return;
+	QMap<QString, QObject *>::const_iterator it = m_pinMap.find(ppId);
+	if (it != m_pinMap.end()) {
+		return it.value();
+	}
 
-    m_currentProvider = provider;
-    m_currentViewModeIndex = 0;
-
-    emit currentProviderChanged();
-    emit viewModeChanged();
+	return 0;
 }
-//! [3]
+
+QPoint WebMaps::worldToPixel(QObject* mapObject, double latitude, double longitude) const
+{
+    MapView* mapview = qobject_cast<MapView*>(mapObject);
+    const Point worldCoordinates = Point(latitude, longitude);
+
+    return mapview->worldToWindow(worldCoordinates);
+}
+
 
 /*
  * Update GeoLocation update interval to the user specified value
@@ -184,105 +176,19 @@ void WebMaps::setRealtimeMode()
 void WebMaps::updateFriendLocation(const QString& ppId, double x, double y, int visibility)
 {
 	if (visibility) {
-		cout << "Update " << ppId.toStdString() << " x: " << x << " y: " << y << " v: " << visibility << endl;
 		emit friendLocationChanged(ppId, x, y, visibility);
 	}
 }
 
-//! [4]
-QString WebMaps::pageContent() const
-{
-
-	m_ProgressDialog->setState(SystemUiProgressState::Active);
-	m_ProgressDialog->setEmoticonsEnabled(true);
-	m_ProgressDialog->setTitle(tr("Initializing Bing Maps..."));
-	m_ProgressDialog->cancelButton()->setLabel(tr("Cancel"));
-	m_ProgressDialog->confirmButton()->setLabel(QString::null);
-
-    const QVariantMap &entry = m_providerData[m_currentProvider];
-
-    m_ProgressDialog->setBody("loading map file...");
-    m_ProgressDialog->setProgress(30);
-    m_ProgressDialog->show();
-
-    QFile file("app/native/assets/map.html");
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Unable to open map template file";
-        return QString();
-    }
-
-    // Replace placeholders with data from current provider
-    QByteArray content = file.readAll();
-    content.replace("$$SCRIPT_FILE$$", entry["scriptFile"].toByteArray());
-    content.replace("$$MAP_URL$$", entry["mapUrl"].toByteArray());
-
-    // Start getting current location
-    if (m_positionInfoSource == 0) {
-    	return QString("Could not create QGeoPositionInfoSource!");
-    }
-
-    bool updateTimeoutConnected = connect(m_positionInfoSource,
-    		SIGNAL(updateTimeout()),
-    		this,
-    		SLOT(positionUpdateTimeout()));
-    Q_ASSERT(updateTimeoutConnected);
-    Q_UNUSED(updateTimeoutConnected);
-    cout << "updateTimeout signal connected" << endl;
-
-    bool positionUpdatedConnected = connect(m_positionInfoSource,
-    		SIGNAL(positionUpdated(const QGeoPositionInfo &)),
-    		this,
-    		SLOT(positionUpdatedHandler(const QGeoPositionInfo &)));
-    Q_ASSERT(positionUpdatedConnected);
-    Q_UNUSED(positionUpdatedConnected);
-    cout << "positionUpdated signal connected" << endl;
-
-    m_positionInfoSource->startUpdates();		// start get my location event loop
-
-    m_ProgressDialog->setBody("getting current location...");
-    m_ProgressDialog->setProgress(60);
-    SystemUiResult::Type result = m_ProgressDialog->exec();
-
-    if (result != SystemUiResult::ConfirmButtonSelection) {
-    	cout << "initialization error!" << endl;
-    	return QString();
-    }
-
-    // initialize bing map to my current location
-    content.replace("$$INIT_LAT$$", QByteArray::number(myLocation.latitude()));
-    content.replace("$$INIT_LNG$$", QByteArray::number(myLocation.longitude()));
-
-    return QString::fromUtf8(content);
-}
-//! [4]
-
-//! [5]
-QString WebMaps::viewModeTitle() const
-{
-    const QVariantMap &entry = m_providerData[m_currentProvider];
-    const QVariantList viewModes = entry["viewModes"].toList();
-
-    return viewModes[m_currentViewModeIndex].toMap()["title"].toString();
-}
-
-QString WebMaps::viewMode() const
-{
-    const QVariantMap &entry = m_providerData[m_currentProvider];
-    const QVariantList viewModes = entry["viewModes"].toList();
-
-    return viewModes[m_currentViewModeIndex].toMap()["mapType"].toString();
-}
-//! [5]
-
 void WebMaps::positionUpdateTimeout()
 {
-	cout << "TIMEOUT!!!!" << endl;
-	m_ProgressDialog->setBody("initialization timeout");
+	m_ProgressDialog->setBody("Initialization timeout");
 	m_ProgressDialog->setState(SystemUiProgressState::Error);
 	m_ProgressDialog->show();
 
 	if ( m_positionInfoSource->property("replyErrorCode").isValid()  ) {
-	    bb::location::PositionErrorCode::Type errorCode = m_positionInfoSource->property("replyErrorCode").value<bb::location::PositionErrorCode::Type>();
+	    bb::location::PositionErrorCode::Type errorCode
+	    	= m_positionInfoSource->property("replyErrorCode").value<bb::location::PositionErrorCode::Type>();
 	    cout << "LM Error Code: ";
 	    switch ( errorCode ) {
 	        // this error code should not be encountered here (included for completeness)
@@ -327,11 +233,10 @@ void WebMaps::positionUpdateTimeout()
 
 void WebMaps::positionUpdatedHandler(const QGeoPositionInfo& update)
 {
-	cout << "SUCCESS " << update.coordinate().latitude() << "," << update.coordinate().longitude() << endl;
 	myLocation = update.coordinate();
 
 	if (!initialized) {
-		m_ProgressDialog->setBody("initialization complete");
+		m_ProgressDialog->setBody("Initialization complete");
 		m_ProgressDialog->setProgress(100);
 		m_ProgressDialog->cancelButton()->setLabel(QString::null);
 		m_ProgressDialog->confirmButton()->setLabel(tr("Ok"));

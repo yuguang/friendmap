@@ -40,6 +40,7 @@ class Settings : public QObject {
 	Q_OBJECT
 	Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
 	Q_PROPERTY(bb::cascades::Image profilePicture READ profilePicture WRITE setProfilePicture NOTIFY profilePictureChanged)
+	Q_PROPERTY(bb::platform::bbm::UserStatus::Type userStatus READ userStatus WRITE setUserStatus NOTIFY userStatusChanged)
 	Q_PROPERTY(QString statusMessage READ statusMessage WRITE setStatusMessage NOTIFY statusMessageChanged)
 	Q_PROPERTY(QString personalMessage READ personalMessage WRITE setPersonalMessage NOTIFY personalMessageChanged)
 
@@ -49,9 +50,11 @@ public:
 
 	Q_INVOKABLE void initUserProfileFromBBM();
 	Q_INVOKABLE void openCamera();
+	Q_INVOKABLE void setStatus(int userStatus, const QString & statusMessage);
 
 	QString displayName();
 	bb::cascades::Image profilePicture();
+	bb::platform::bbm::UserStatus::Type userStatus();
 	QString statusMessage();
 	QString personalMessage();
 
@@ -60,8 +63,9 @@ public Q_SLOTS:
 	void setDisplayNameFromBBM(const QString& displayName);
 	void setProfilePicture(const bb::cascades::Image& profilePicture);
 	void setProfilePictureFromBBM(bb::platform::bbm::ImageType::Type mimeType, const QByteArray& profilePicture);
+	void setUserStatus(bb::platform::bbm::UserStatus::Type userStatus);
 	void setStatusMessage(const QString& statusMessage);
-	void setStatusMessageFromBBM(bb::platform::bbm::UserStatus::Type statusType, const QString& statusMessage);
+	void setStatusFromBBM(bb::platform::bbm::UserStatus::Type statusType, const QString& statusMessage);
 	void setPersonalMessage(const QString& personalMessage);
 	void setPersonalMessageFromBBM(const QString& personalMessage);
 	void onCameraInvokeResult();
@@ -70,9 +74,11 @@ public Q_SLOTS:
 
 signals:
 	void displayNameChanged(const QString& displayName);
-	void profilePictureChanged(const bb::cascades::Image& profilePicture);
+	void profilePictureChanged(const QByteArray& profilePicture);
+	void profilePictureChangedByUser(const bb::cascades::Image& profilePicture);
+	void userStatusChanged(bb::platform::bbm::UserStatus::Type userStatus);
 	void statusMessageChanged(const QString& statusMessage);
-	void statusMessageChangedFromBBM(const QString& statusMessage);
+	void statusChangedFromBBM(bb::platform::bbm::UserStatus::Type type, const QString& statusMessage);
 	void personalMessageChanged(const QString& personalMessage);
 
 private:
@@ -85,6 +91,7 @@ private:
 
 	QString m_displayName;
 	bb::cascades::Image m_profilePicture;
+	bb::platform::bbm::UserStatus::Type m_userStatus;
 	QString m_statusMessage;
 	QString m_personalMessage;
 };

@@ -1,18 +1,8 @@
-/* Copyright (c) 2012 Research In Motion Limited.
+/**
+ * Connect to BBM
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * by Sukwon Oh
  */
-
 #include "RegistrationHandler.hpp"
 
 #include <bb/cascades/AbstractPane>
@@ -23,7 +13,6 @@
 #include <bb/platform/bbm/Context>
 #include <bb/platform/bbm/RegistrationState>
 
-#include "WebMaps.hpp"
 #include "LoginMessage.h"
 #include "ServerInterface.h"
 
@@ -37,14 +26,13 @@ using namespace bb::platform::bbm;
 using namespace bb::system;
 
 
-RegistrationHandler::RegistrationHandler(const QUuid &uuid, WebMaps* webMaps, QObject *parent)
+RegistrationHandler::RegistrationHandler(const QUuid &uuid, QObject *parent)
     : QObject(parent)
     , m_context(uuid)
     , m_isAllowed(false)
     , m_progress(BbmRegistrationProgress::NotStarted)
     , m_temporaryError(false)
     , m_statusMessage(tr("Please wait while the application connects to BBM."))
-	, m_webMaps(webMaps)
 {
     QmlDocument* qml = QmlDocument::create("asset:///registration.qml")
                        .parent(this);
@@ -55,7 +43,8 @@ RegistrationHandler::RegistrationHandler(const QUuid &uuid, WebMaps* webMaps, QO
     	SystemDialog *uuidDialog = new SystemDialog("OK");
     	uuidDialog->setTitle("UUID Error");
         uuidDialog->setBody("Invalid/Empty UUID, please set correctly in main.cpp");
-        connect(uuidDialog, SIGNAL(finished(bb::system::SystemUiResult::Type)), this, SLOT(dialogFinished(bb::system::SystemUiResult::Type)));
+        connect(uuidDialog, SIGNAL(finished(bb::system::SystemUiResult::Type)),
+        		this, SLOT(dialogFinished(bb::system::SystemUiResult::Type)));
         uuidDialog->show();
         return;
     }

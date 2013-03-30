@@ -1,9 +1,14 @@
-// Navigation pane project template
+/*
+ * Main Window for the Friendtracker App
+ * 
+ * by Sukwon Oh
+ */
 import bb.cascades 1.0
 import bb.system 1.0
+import bb.cascades.maps 1.0
 
 NavigationPane {
-    id: navigationPane
+    id: navigationPane        
     Menu.definition: MenuDefinition {
         // help action
         actions: [
@@ -19,7 +24,10 @@ NavigationPane {
         // settings action
         settingsAction: SettingsActionItem {
         	onTriggered: {
+        	    // this is only effective on first call, multiple calls are ignored internally
+        	    // load the user's profile setting
         	    _settings.initUserProfileFromBBM();
+        	    // load settings page
                 navigationPane.push(settingsPage.createObject());
             }
     	}
@@ -32,20 +40,12 @@ NavigationPane {
     Page {
         actions: [
             ActionItem {
-                title: _mapView.viewModeTitle
-                imageSource: "asset:///images/bingmaps.png"
-                ActionBar.placement: ActionBarPlacement.OnBar
-                onTriggered: {
-                    _mapView.nextViewMode()
-                    map.setMapType(_mapView.viewMode);
-                }
-            },
-            ActionItem {
                 title: "Center Me"
                 imageSource: "asset:///images/pin.png"
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
-                    map.setCenter(_mapView.myLat, _mapView.myLon);
+                    mapview.latitude = _mapView.myLat;
+                    mapview.longitude = _mapView.myLon;
                 }
             },
             ActionItem {
@@ -54,7 +54,7 @@ NavigationPane {
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
                     console.log("showing friends javascript");
-                    _mapView.showFriends()
+                    chatSheet.open();
                 }
             }
         ]        
@@ -68,154 +68,256 @@ NavigationPane {
             property variant centerPixel: [ "-1", "-1" ]
             //! [0]
             
-            //! [1]
-            function setZoom(zoom) {
-                var script = "setZoom(" + zoom + ")"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function zoomIn() {
-                var script = "zoomIn()"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function zoomOut() {
-                var script = "zoomOut()"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function setCenter(lat, lon) {
-                var script = "setCenter(" + lat + "," + lon + ")"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function setMapType(mapType) {
-                var script = "setMapTypeId(" + mapType + ")"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function createPushPin(lat, lon, title) {
-                var script = "createPushPin(" + lat + "," + lon + "," + "\"" + title + "\"" + "," + "\"local:///assets/images/pin.png\"" + ")"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            function removeAllPins() {
-                var script = "removeAllPins()";
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
+            /*
+             * Insert a friend into a friends list in websocket.js
+             */
             function addOnlineFriend(friend) {
                 var script = "addOnlineFriend(\"" + friend + "\")";
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
+                websocketView.evaluateJavaScript(script, JavaScriptWorld.Normal);
             }
+            
+            /*
+             * Send subscription request to the redis
+             */
             function subscribe() {
                 var script = "subscribe()";
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
+                websocketView.evaluateJavaScript(script, JavaScriptWorld.Normal);
             }
+            
+            /*
+             * Unsubscribe to all user's friends
+             */
             function unsubscribe() {
                 var script = "unsubscribe()"
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
+                websocketView.evaluateJavaScript(script, JavaScriptWorld.Normal);
             }
-            function updateLocation(ppId, x, y, visibility) {
-                var script = "updatePushPin(" + x + ", " + y + ", \"" + ppId + "\")";
-                qwvMapView.evaluateJavaScript(script, JavaScriptWorld.Normal);
-            }
-            //! [1]
-            
-            ScrollView {
-                id: scrollView
-                scrollViewProperties {
-                    scrollMode: ScrollMode.None
-                    pinchToZoomEnabled: true
+
+            MapView {
+                id: mapview
+                altitude: 3000
+                latitude: _mapView.myLat
+                longitude: _mapView.myLon
+                preferredWidth: 768
+                preferredHeight: 1280                  
+                
+                onCreationCompleted: {
+                    // Put a pin for the user on map after the mapView is initialized
+                    pinContainer.addMe(_mapView.myLat, _mapView.myLon);
                 }
-                //! [2]
-                WebView {
-                    id: qwvMapView
-            
-                    html: _mapView.pageContent
-                //! [2]
                 
-                	onCreationCompleted: {
-                	    // connect to subscribe/unsubscribe signals from WebMaps
-                        _mapView.subscribe.connect(map.subscribe);
-                        _mapView.unsubscribe.connect(map.unsubscribe);
-                        _mapView.friendLocationChanged.connect(map.updateLocation);
-                    }
+                onAltitudeChanged: {
+                }
+                onHeadingChanged: {
+                }
+                onLatitudeChanged: {
+                }
+                onLongitudeChanged: {
+                }
+                onTiltChanged: {
+                }
+                onMapLongPressed: {
+                }
+                onRequestRender: {
+                    pinContainer.updateMarkers();
+                }
+            }
+            
+            Container {
+                id: pinContainer
+                // Must match the mapview width and height and position
+                preferredHeight: 1280
+                preferredWidth: 768
+                //touchPropagationMode: TouchPropagationMode.PassThrough
+                overlapTouchPolicy: OverlapTouchPolicy.Allow
+                property variant currentBubble: null
+                property variant me
+                layout: AbsoluteLayout {
+                }
                 
-                	onLoadingChanged: {
-                	    if (loadRequest.status == WebLoadStatus.Succeeded) {
-                	    	for (var i = 0; i < _friendtracker.onlinePpIds.length; i++) {
-                	        	map.addOnlineFriend(_friendtracker.onlinePpIds[i]);
-                	        }
-                	    	map.subscribe();
-                	    }                	                    	
-                	}
-            
-                    onMinContentScaleChanged: {
-                        scrollView.scrollViewProperties.minContentScale = minContentScale;
+                /*
+                 * Connect the pinContainer to update the user's profile picture when it is changed from BBM
+                 * Connect the pinContainer to update the friend's profile picture when it is changed from BBM
+                 */
+                onCreationCompleted: {
+                    _friendtracker.updateProfilePictureOnMap.connect(pinContainer.updateProfilePicture);
+                    _friendtracker.updateFriendProfilePictureOnMap.connect(pinContainer.updateFriendProfilePicture);
+                }
+                
+                /*
+                 * Method for adding myself on the map
+                 */
+                function addMe(lat, lon) {
+                    var marker = pin.createObject();
+                    marker.lat = lat;
+                    marker.lon = lon;
+                    // update the user's profile picture on map
+                    var image = _friendtracker.getProfilePicture();
+                    marker.profileImage.image = image;
+                    var xy = _mapView.worldToPixelInvokable(mapview, marker.lat, marker.lon);
+                    marker.x = xy[0];
+                    marker.y = xy[1];
+                    pinContainer.add(marker);
+                    me = marker;
+                    
+                    marker.animDrop.play();                                    
+                }
+                
+                /*
+                 * Method for adding a marker for general user(i.e. friends)
+                 */
+                function addPin(ppId, lat, lon) {
+                    var marker = _mapView.getPin(ppId);
+                    var isNew = (marker == null);
+                    if (isNew) {
+                        marker = pin.createObject();
                     }
-                    onMaxContentScaleChanged: {
-                        scrollView.scrollViewProperties.maxContentScale = maxContentScale;
+                    marker.lat = lat;
+                    marker.lon = lon;                    
+                    // asynchronously update the friend's profile picture on map
+                    _friendtracker.askFriendProfilePicture(ppId);
+                    var xy = _mapView.worldToPixelInvokable(mapview, marker.lat, marker.lon);
+                    marker.x = xy[0];
+                    marker.y = xy[1];
+                    if (isNew) {
+                        pinContainer.add(marker);
+                        marker.animDrop.play();
+                    }                    
+                    _mapView.addPin(ppId, marker);                    
+                }
+                
+                /*
+                 * Show bubble with the person's current address
+                 */
+                function showBubble(pin) {
+                    if (currentBubble != null) {
+                        pinContainer.remove(currentBubble);
                     }
-            
-                    //! [3]
-                    onMessageReceived: {
-                        if (message.data.indexOf("centerChanged") >= 0) {
-                            var data = message.data.substring(message.data.indexOf(":") + 1);
-                            var values = data.split(",");
-                            center = [
-                                values[0],
-                                values[1]
-                            ];
-                            centerPixel = [
-                                values[2],
-                                values[3]
-                            ];
-                            label.text = qsTr("centerChanged:\nWorld: %1, %2\nPixel: %3, %4")
-                                             .arg(center[0].substr(0, 9)).arg(center[1].substr(0, 9))
-                                             .arg(Math.round(x)).arg(Math.round(y));
-                            labelPosition.positionX = centerPixel[0];
-                            labelPosition.positionY = centerPixel[1];
-                        } else if (message.data.indexOf("clicked") >= 0) {
-                            var data = message.data.substring(message.data.indexOf(":") + 1);
-                            var values = data.split(",");
-                            var lat = values[0];
-                            var lon = values[1];
-                            var x = values[2];
-                            var y = values[3];
-                            label.text = qsTr("clicked:\nWorld: %1, %2\nPixel: %3, %4")
-                                             .arg(lat.substr(0, 9)).arg(lon.substr(0, 9))
-                                             .arg(Math.round(x)).arg(Math.round(y));
-                            labelPosition.positionX = x;
-                            labelPosition.positionY = y;
-                        } else if (message.data.indexOf("markerClicked") >= 0) {
-                            var data = message.data.substring(message.data.indexOf(":") + 1);
-                            var values = data.split(",");
-                            var lat = values[0];
-                            var lon = values[1];
-                            var x = values[2];
-                            var y = values[3];
-                            label.text = qsTr("markerClicked:\nWorld: %1, %2\nPixel: %3, %4")
-                                             .arg(lat.substr(0, 9)).arg(lon.substr(0, 9))
-                                             .arg(Math.round(x)).arg(Math.round(y));
-                            labelPosition.positionX = x;
-                            labelPosition.positionY = y;
+                    
+                    var details = bubble.createObject();
+                    details.lat = pin.lat;	// this is not real error
+                    details.lon = pin.lon;	// this is not real error
+                    var xy = _mapView.worldToPixelInvokable(mapview, details.lat, details.lon);
+                    details.x = xy[0];
+                    details.y = xy[1];
+                    // asynchronously get the person's address given location and write it on bubble
+                    _friendtracker.getAddress(details, pin.lat, pin.lon);
+                    pinContainer.add(details);
+                    details.play();
+                    currentBubble = details;
+                }
+                
+                /*
+                 * Not used now
+                 */
+                function showMe() {
+                    var marker = pin.createObject();
+                    marker.profileImageSource = "asset:///profile.jpg"
+                    marker.pointerOffsetX = 30
+                    marker.pointerOffsetY = 30
+                    pinContainer.insert(-1, marker);
+                    marker.visible = false;
+                    me = marker;
+                }
+                
+                /*
+                 * Update the user's profile picture
+                 */
+                function updateProfilePicture(image) {
+                    var marker = pinContainer.at(0);
+                    if (marker == null) {
+                        console.log("MARKER NULL!!!");
+                    }
+                    marker.profileImage.image = image;                    
+                }
+                
+                /*
+                 * Find a pin for the user with ppId and update its profile image
+                 */
+                function updateFriendProfilePicture(ppId, image) {
+                    var marker = _mapView.getPin(ppId);
+                    if (marker != null) {
+                        marker.profileImage.image = image;
+                    }                    
+                }
+                
+                /*
+                 * Update every marker present
+                 */
+                function updateMarkers() {
+                    _mapView.updateMarkers(mapview, pinContainer);
+                }
+                
+                /*
+                 * Remove bubble if it exists
+                 */
+                function removeBubble() {
+                    if (currentBubble != null) {
+                        pinContainer.remove(currentBubble);
+                    }                    
+                }
+                
+                /*
+                 * Remove bubble when the user touchs on screen outside of bubble
+                 */
+                onTouch: {
+                    if (event.isDown()) {
+                    	if (currentBubble == null) return;                        
+                        if ((event.localX <= currentBubble.actualX) || (event.localX >= currentBubble.actualX + currentBubble.contentWidth) || (event.localY <= currentBubble.actualY) || (event.localY >= currentBubble.actualY + currentBubble.contentHeight)) {
+                            removeBubble();
                         }
                     }
-                    //! [3]
+                }
+            }
+            attachedObjects: [
+                //! [5]
+                ComponentDefinition {
+                    id: pin
+                    source: "pin.qml"
+                },
+                ComponentDefinition {
+                    id: bubble
+                    source: "bubble.qml"
+                }
+            ]
             
-                    //! [4]
-                    gestureHandlers: [
-                        PinchHandler {
-                            property variant initial
-                            onPinchUpdated: {
-                                if (! initial) {
-                                    initial = event.distance;
-                                }
-                                if ((event.distance - initial) / 50 > 1) {
-                                    initial = event.distance;
-                                    map.zoomIn();
-                                } else if ((event.distance - initial) / 50 < -1) {
-                                    initial = event.distance;
-                                    map.zoomOut();
-                                }
-                            }
+            /*
+             * This webview is purely for creating websocket connection on cascades
+             */
+            WebView {
+                id: websocketView
+                html: _webSocketView.pageContent
+                visible: false
+                
+                // connect to subscribe/unsubscribe signals from WebMaps
+                onCreationCompleted: {                    
+                    _mapView.subscribe.connect(map.subscribe);
+                    _mapView.unsubscribe.connect(map.unsubscribe);
+                }
+
+				/*
+				 * When the webview loads completely, add the user's friends to websocket.js' friends list
+				 * and subscribe to all of them.
+				 */
+                onLoadingChanged: {
+                    if (loadRequest.status == WebLoadStatus.Succeeded) {
+                        for (var i = 0; i < _friendtracker.onlinePpIds.length; i ++) {
+                            map.addOnlineFriend(_friendtracker.onlinePpIds[i]);
                         }
-                    ]
-                    //! [4]
+                        map.subscribe();
+                    }
+                }
+
+				/*
+				 * When location update arrives, update the pin for that user
+				 */
+                onMessageReceived: {
+                    if (message.data.indexOf("UserLocation") >= 0) {
+                        var data = message.data.substring(message.data.indexOf(":") + 1);
+                        var values = data.split(",");
+                        var ppId = values[0].substr(1);
+                        console.log("ppId: " + ppId + "@" + values[1] + "," + values[2]);
+                        pinContainer.addPin(ppId, values[1], values[2]);
+                    }
                 }
             }
         }       

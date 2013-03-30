@@ -10,6 +10,7 @@ device {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
@@ -20,10 +21,14 @@ device {
                  $$quote($$BASEDIR/src/Settings.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.cpp) \
+                 $$quote($$BASEDIR/src/Utility.cpp) \
                  $$quote($$BASEDIR/src/WebMaps.cpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+        HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
                  $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
@@ -36,7 +41,9 @@ device {
                  $$quote($$BASEDIR/src/Settings.hpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.h) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.h) \
-                 $$quote($$BASEDIR/src/WebMaps.hpp)
+                 $$quote($$BASEDIR/src/Utility.h) \
+                 $$quote($$BASEDIR/src/WebMaps.hpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.hpp)
     }
 
     CONFIG(release, debug|release) {
@@ -47,6 +54,7 @@ device {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
@@ -57,10 +65,14 @@ device {
                  $$quote($$BASEDIR/src/Settings.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.cpp) \
+                 $$quote($$BASEDIR/src/Utility.cpp) \
                  $$quote($$BASEDIR/src/WebMaps.cpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+        HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
                  $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
@@ -73,7 +85,9 @@ device {
                  $$quote($$BASEDIR/src/Settings.hpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.h) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.h) \
-                 $$quote($$BASEDIR/src/WebMaps.hpp)
+                 $$quote($$BASEDIR/src/Utility.h) \
+                 $$quote($$BASEDIR/src/WebMaps.hpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.hpp)
     }
 }
 
@@ -86,6 +100,7 @@ simulator {
         LIBS += -lQtCore
 
         SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
@@ -96,10 +111,14 @@ simulator {
                  $$quote($$BASEDIR/src/Settings.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.cpp) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.cpp) \
+                 $$quote($$BASEDIR/src/Utility.cpp) \
                  $$quote($$BASEDIR/src/WebMaps.cpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+        HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
+                 $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
                  $$quote($$BASEDIR/src/GetLocationsReply.h) \
                  $$quote($$BASEDIR/src/LoginMessage.h) \
@@ -112,7 +131,9 @@ simulator {
                  $$quote($$BASEDIR/src/Settings.hpp) \
                  $$quote($$BASEDIR/src/UpdateLocationMessage.h) \
                  $$quote($$BASEDIR/src/UpdateLocationReply.h) \
-                 $$quote($$BASEDIR/src/WebMaps.hpp)
+                 $$quote($$BASEDIR/src/Utility.h) \
+                 $$quote($$BASEDIR/src/WebMaps.hpp) \
+                 $$quote($$BASEDIR/src/WebSocketView.hpp)
     }
 }
 

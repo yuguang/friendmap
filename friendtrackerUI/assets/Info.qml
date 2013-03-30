@@ -1,6 +1,12 @@
 import bb.cascades 1.0
 import bb.cascades.pickers 1.0
 
+/**
+ * Brief description of project
+ * 
+ * by Sukwon Oh
+ */
+
 Page {
     id: infoPage
 

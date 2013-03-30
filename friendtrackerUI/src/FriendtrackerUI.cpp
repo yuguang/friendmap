@@ -4,6 +4,7 @@
 #include <bb/cascades/Application>
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/AbstractPane>
+#include <bb/cascades/Image>
 #include <bb/platform/bbm/ContactService>
 #include <bb/platform/bbm/Contact>
 #include <bb/platform/bbm/UserProfile>
@@ -12,6 +13,8 @@
 #include <bb/pim/contacts/Contact>
 #include <bb/pim/contacts/ContactListFilters>
 #include <bb/system/SystemToast>
+#include <bb/ImageData>
+#include <bb/utility/ImageConverter>
 
 #include <QSettings>
 
@@ -19,6 +22,8 @@
 #include "UpdateLocationMessage.h"
 #include "GetLocationsMessage.h"
 #include "ServerInterface.h"
+#include "Utility.h"
+#include "GetAddressHelper.h"
 
 #include <iostream>
 #include <sstream>
@@ -32,14 +37,18 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 : QObject(app)
 , m_app(app)
 , m_uuid(uuid)
-, m_webMaps(new WebMaps(this))
-, m_regHandler(new RegistrationHandler(m_uuid, m_webMaps, this))
+, m_webMaps(0)
+, m_webSocketView(new WebSocketView(this))
+, m_regHandler(new RegistrationHandler(m_uuid, this))
+, m_contactService(0)
 , m_profile(0)
 , m_sessionKey("")
 , m_serverInterface(new ServerInterface(this))
 , m_settings(new Settings(this, m_regHandler))
 , m_regularModeTimer(new QTimer(this))
 , m_visibility(1)
+, m_numProfilePictureUpdates(0)
+, m_currentMode(realtime)
 
 {
 	// get user profile when bbm registration succeeds
@@ -47,21 +56,7 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 	Q_ASSERT(connected);
 
 	// load main.qml when bbm registration succeeds
-	connected = QObject::connect(m_regHandler, SIGNAL(registered()), this, SLOT(initWebMaps()));
-	Q_ASSERT(connected);
-
-	// login when user location is retrieved
-	connected = QObject::connect(m_webMaps,
-			SIGNAL(gotMyLocation(const QGeoCoordinate &)),
-			this,
-			SLOT(login(const QGeoCoordinate &)));
-	Q_ASSERT(connected);
-
-	// update location whenever user's location is updated (every 5 sec by default?)
-	connected = QObject::connect(m_webMaps,
-			SIGNAL(myLocationChanged(const QGeoCoordinate &)),
-			this,
-			SLOT(updateLocation(const QGeoCoordinate &)));
+	connected = QObject::connect(m_regHandler, SIGNAL(registered()), this, SLOT(initMap()));
 	Q_ASSERT(connected);
 
 	// get session key from login
@@ -98,6 +93,32 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 	Q_UNUSED(connected);
 }
 
+/*
+ * Create Map instance here after BBM registration is successful.
+ */
+void FriendtrackerUI::initMap()
+{
+	m_webMaps = new WebMaps(this);
+
+	// login when user location is ready
+	bool connected = QObject::connect(m_webMaps,
+			SIGNAL(gotMyLocation(const QGeoCoordinate &)),
+			this,
+			SLOT(login(const QGeoCoordinate &)));
+	Q_ASSERT(connected);
+
+	// update location whenever user's location is updated (every 5 sec by default?)
+	connected = QObject::connect(m_webMaps,
+			SIGNAL(myLocationChanged(const QGeoCoordinate &)),
+			this,
+			SLOT(updateLocation(const QGeoCoordinate &)));
+	Q_ASSERT(connected);
+	Q_UNUSED(connected);
+
+	// XXX: Looks like we need to register signal/slot before initializing map
+	m_webMaps->init();
+}
+
 void FriendtrackerUI::login(const QGeoCoordinate& coord)
 {
 	LoginMessage msg(m_profile->ppId(),
@@ -110,8 +131,10 @@ void FriendtrackerUI::login(const QGeoCoordinate& coord)
 
 void FriendtrackerUI::setSessionKey(const QString& sessionKey)
 {
-	cout << "new session key: " << sessionKey.toStdString() << endl;
 	m_sessionKey = sessionKey;
+
+	// load Map when the session key returns from login reply
+	loadMap();
 }
 
 void FriendtrackerUI::endApplication()
@@ -121,7 +144,6 @@ void FriendtrackerUI::endApplication()
 
 void FriendtrackerUI::setOnlinePpIds(const QStringList& ppIds)
 {
-	cout << "got online ppIds" << endl;
 	// FIXME: it maybe that we should always subscribe to all of user's friends
 	//m_onlinePpIds = ppIds;
 	m_onlinePpIds = m_ppIds;
@@ -149,21 +171,29 @@ void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
 }
 
 /*
+ * Only changes mode to regular if current mode is realtime
  * Start the regular mode timer (for every timeout, update the user's location)
  */
 void FriendtrackerUI::setRegularMode(double frequency)
 {
-	m_regularModeTimer->start((int)frequency * 1000);
-	m_webMaps->setRegularMode();
+	if (m_currentMode == realtime) {
+		m_regularModeTimer->start((int)frequency * 1000);
+		m_webMaps->setRegularMode();
+		m_currentMode = regular;
+	}
 }
 
 /*
+ * Only changes mode to realtime if current mode is regular
  * Stop the regular mode timer.
  */
 void FriendtrackerUI::setRealtimeMode()
 {
-	m_regularModeTimer->stop();
-	m_webMaps->setRealtimeMode();
+	if (m_currentMode == regular) {
+		m_regularModeTimer->stop();
+		m_webMaps->setRealtimeMode();
+		m_currentMode = realtime;
+	}
 }
 
 void FriendtrackerUI::setVisibility(bool visibility)
@@ -192,14 +222,107 @@ void FriendtrackerUI::updateFriendsLocation(const QList<User>& friends)
 	}
 }
 
-void FriendtrackerUI::initWebMaps()
+bb::cascades::Image FriendtrackerUI::getProfilePicture()
 {
-	cout << "initWebMaps started" << endl;
+	const QByteArray origImage = m_profile->displayPicture();
+	return Utility::scaleImage(origImage, 140, 140);
+}
+
+/*
+ * This is called when a pin is created for a user with ppId
+ */
+void FriendtrackerUI::askFriendProfilePicture(const QString& ppId)
+{
+	QList<Contact> contacts = m_contactService->contacts();
+	for (int i = 0; i < contacts.size(); i++) {
+		if (contacts.at(i).ppId() == ppId) {
+			bool result = m_contactService->requestDisplayPicture(contacts.at(i).handle());
+			if (!result) {
+				cout << "FAILED TO GET FRIEND's PROFILE PICTURE" << endl;
+			}
+			break;
+		}
+	}
+}
+
+/*
+ * A Friend's Profile Picture is asynchronously returned here.
+ * Notify main.qml to dynamically update the friend's pin image.
+ */
+void FriendtrackerUI::returnFriendDisplayPicture(const QString& handle,
+												 const bb::platform::bbm::ImageType::Type imageType,
+												 const QByteArray& displayPicture)
+{
+	Q_UNUSED(imageType);
+	QByteArray scaledImageInByteArray = Utility::scaleImage(displayPicture, 140, 140);
+	QList<Contact> contacts = m_contactService->contacts();
+	for (int i = 0; i < contacts.size(); i++) {
+		if (contacts.at(i).handle() == handle) {
+			emit updateFriendProfilePictureOnMap(contacts.at(i).ppId(), Image(scaledImageInByteArray));
+			break;
+		}
+	}
+}
+
+/*
+ * When the profile picture changed, save to disk for map to load.
+ */
+void FriendtrackerUI::updateProfilePicture(const QByteArray& imageData)
+{
+	m_numProfilePictureUpdates++;
+	saveUserProfilePicture(imageData);
+
+	QByteArray scaledImageInByteArray = Utility::scaleImage(imageData, 140, 140);
+	emit updateProfilePictureOnMap(Image(scaledImageInByteArray));
+}
+
+/*
+ * Reads user's profile picture from BBM and then write to disk
+ * for loading on the map later.
+ */
+void FriendtrackerUI::saveUserProfilePicture()
+{
+	// write an image file with user's profile picture
+	UserProfile profile(&m_regHandler->context());
+	const QByteArray& displayPicture = profile.displayPicture();
+
+	saveUserProfilePicture(displayPicture);
+}
+
+/*
+ * Save the given image data in byte array to disk.
+ */
+void FriendtrackerUI::saveUserProfilePicture(const QByteArray& imageData)
+{
+	QImage imageToWrite;
+	if (!imageToWrite.loadFromData(imageData)) {
+		cout << "failed to load profile picture for saving!" << endl;
+	} else {
+		imageToWrite = imageToWrite.scaled(140, 140, Qt::KeepAspectRatio);	// profile picture is 80x80
+		stringstream ss;
+		ss << "app/native/assets/profile.jpg";
+		if (!imageToWrite.save(ss.str().c_str(), "JPG")) {
+			cout << "failed to save profile picture!" << endl;
+		}
+	}
+}
+
+void FriendtrackerUI::loadMap()
+{
+	cout << "loadMap started" << endl;
+
+	// save user's profile before loading the map
+	saveUserProfilePicture();
+	bool result = connect(m_settings, SIGNAL(profilePictureChanged(const QByteArray &)),
+			this, SLOT(updateProfilePicture(const QByteArray &)));
+	Q_ASSERT(result);
+
     // create scene document from main.qml asset
     // set parent to created document to ensure it exists for the whole application lifetime
     QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(m_app);
     qml->setContextProperty("_mapView", m_webMaps);
     qml->setContextProperty("_settings", m_settings);
+    qml->setContextProperty("_webSocketView", m_webSocketView);
     qml->setContextProperty("_friendtracker", this);
 
     // create root object for the UI
@@ -208,47 +331,38 @@ void FriendtrackerUI::initWebMaps()
     m_app->setScene(root);
 }
 
+void FriendtrackerUI::getAddress(QObject* containerObject, double lat, double lng)
+{
+	// FIXME: I know this is a leak
+	GetAddressHelper* helper = new GetAddressHelper(containerObject, lat, lng);
+	Q_UNUSED(helper);
+}
+
+/*
+ * Initialize Contact Services.
+ * Initialize the user's profile and also register a SLOT for
+ * displayPictureUpdated() which is emitted when the user's friend's display picture is updated.
+ */
 void FriendtrackerUI::initUserProfile()
 {
 	m_profile = new UserProfile(&m_regHandler->context(), this);
-	/*
-	cout << "my display name: " << m_profile->displayName().toStdString() << endl;
-	cout << "my personal msg: " << m_profile->personalMessage().toStdString() << endl;
-	cout << "my status msg: " << m_profile->statusMessage().toStdString() << endl;
-	cout << "my ppId: " << m_profile->ppId().toStdString() << endl;
-	*/
+	m_contactService = new ContactService(&m_regHandler->context(), 0);
 
-	ContactService cs(&m_regHandler->context(), 0);
-	//if (cs.isValid()) cout << "contact service is valid " << cs.contactCount() << endl;
-	QList<Contact> contacts = cs.contacts();
+	// send image to main.qml when friend's display picture is updated
+	bool connected = QObject::connect(m_contactService, SIGNAL(displayPictureUpdated(const QString &,
+			const bb::platform::bbm::ImageType::Type, const QByteArray &)),
+			this,
+			SLOT(returnFriendDisplayPicture(const QString &,
+			const bb::platform::bbm::ImageType::Type, const QByteArray &)));
+	Q_ASSERT(connected);
+	Q_UNUSED(connected);
+
+	QList<Contact> contacts = m_contactService->contacts();
 	QStringList ppIds;
-	//cout << "getting contacts" << endl;
 	for (int i = 0; i < contacts.size(); i++) {
-		stringstream ss;
-		ss << "ppId: " << contacts.at(i).ppId().toStdString()
-		   << " displayName: " << contacts.at(i).displayName().toStdString()
-		   << endl;
-		cout << ss.str();
-		SystemToast toast;
-		toast.setBody(QString(ss.str().c_str()));
-		toast.exec();
 		ppIds.append(contacts.at(i).ppId());
 	}
 	m_ppIds = ppIds;
-	/*using namespace bb::pim;
-	bb::pim::contacts::ContactListFilters filter;
-	filter = filter.setLimit(10000);
-	QList<bb::pim::contacts::Contact> contacts = bb::pim::contacts::ContactService().contacts(filter);
-	for (int i = 0; i < contacts.size(); i++) {
-		contacts::Contact detailedContact = contacts::ContactService().contactDetails(contacts.at(i).id());
-		cout << "name: " << contacts.at(i).displayName().toStdString()
-			 << " account id: " << contacts.at(i).accountId() << endl;
-		QList<contacts::ContactAttribute> attributes = detailedContact.attributes();
-		for (int j = 0; j < attributes.size(); j++) {
-			cout << attributes.at(j).label().toStdString() << ": "
-					<< attributes.at(j).value().toStdString() << endl;
-		}
-	}*/
 
 	emit userProfileInitialized();
 }

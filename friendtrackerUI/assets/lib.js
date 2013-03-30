@@ -1,4 +1,10 @@
 /**
+ * Utility class
+ * 
+ * by Sukwon Oh, Yuguang Zhang
+ */
+
+/**
  * handles decoding subscription and get replies
  */
 decodeJSON = function(j) {
@@ -24,10 +30,10 @@ decodeJSON = function(j) {
 /**
  * subscribe to real-time location updates for list of users
  * @param friends
- * @param map
+ * @param navigator
  * @returns {Function}
  */
-function startSubscription(friends, map) {
+function startSubscription(friends, websocketView) {
 	console.log("start subscription");
 	var host = "198.58.106.27";
     var port = 8081;
@@ -49,9 +55,14 @@ function startSubscription(friends, map) {
     	return _results;
     };
     socket.onmessage = function(message) {
+    	console.log(message.data);
+    	if (message == null) {
+    		console.log("data NULL!");
+    	}
     	var data = decodeJSON(message);
     	if (data) {
-    		return map.plot(data);
+    		console.log(socket + " user: " + data.user + " x:" + data.location.x + " y:" + data.location.y);
+    		return websocketView.updateUserLocation(data.user, data.location.x, data.location.y);    		
     	}
     };
     
@@ -65,7 +76,6 @@ function endSubscription(friends, websocket) {
 	console.log("end subscription");
 	for (var i = 0; i < friends.length; i++) {
 		var msg = JSON.stringify({"UNSUBSCRIBE": friends[i]});
-		console.log("MSG: " + msg);
 		websocket.send(msg);
 	}
 }

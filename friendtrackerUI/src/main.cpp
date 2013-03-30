@@ -1,4 +1,6 @@
-// Navigation pane project template
+/**
+ * Friendtracker App
+ */
 #include "FriendtrackerUI.hpp"
 
 #include <bb/cascades/Application>

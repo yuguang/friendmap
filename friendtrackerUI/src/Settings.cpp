@@ -24,6 +24,8 @@
 
 #include <bps/soundplayer.h>
 
+#include "Utility.h"
+
 #include <iostream>
 
 using namespace std;
@@ -83,7 +85,7 @@ bb::cascades::Image Settings::profilePicture()
 void Settings::setProfilePicture(const bb::cascades::Image& profilePicture)
 {
 	m_profilePicture = profilePicture;
-	emit profilePictureChanged(profilePicture);
+	emit profilePictureChangedByUser(m_profilePicture);
 }
 
 /*
@@ -96,6 +98,41 @@ void Settings::setProfilePictureFromBBM(bbm::ImageType::Type mimeType, const QBy
 	emit profilePictureChanged(profilePicture);
 }
 
+bbm::UserStatus::Type Settings::userStatus()
+{
+	return m_userStatus;
+}
+
+void Settings::setUserStatus(bbm::UserStatus::Type userStatus)
+{
+	m_userStatus = userStatus;
+	bool result = m_userProfile->requestUpdateStatus(m_userStatus, m_statusMessage);
+	if (!result) {
+		cout << "STATUS UPDATE FAILED" << endl;
+	}
+	emit userStatusChanged(userStatus);
+}
+
+/*
+ * Explicitly used when ...
+ */
+void Settings::setStatus(int userStatus, const QString& statusMessage)
+{
+	if (userStatus == 1) {
+		m_userStatus = bbm::UserStatus::Available;
+	} else {
+		m_userStatus = bbm::UserStatus::Busy;
+	}
+	m_statusMessage = statusMessage;
+
+	bool result = m_userProfile->requestUpdateStatus(m_userStatus, "");
+	if (!result) {
+		cout << "STATUS UPDATE FAILED2" << endl;
+	}
+	emit userStatusChanged(m_userStatus);
+	emit statusMessageChanged(m_statusMessage);
+}
+
 QString Settings::statusMessage()
 {
 	return m_statusMessage;
@@ -106,14 +143,10 @@ QString Settings::statusMessage()
  */
 void Settings::setStatusMessage(const QString& statusMessage)
 {
-	cout << "STATUS CHANGED " << statusMessage.toStdString() << endl;
-	bool result = false;
-	if (statusMessage == "Busy") {
-		result = m_userProfile->requestUpdateStatus(bbm::UserStatus::Busy, statusMessage);
-		cout << "setStatusMessage - result: " << result << endl;
-	} else {
-		m_userProfile->requestUpdateStatus(bbm::UserStatus::Available, statusMessage);
-		cout << "setStatusMessage - result: " << result << endl;
+	bool result = m_userProfile->requestUpdateStatus(m_userStatus, statusMessage);
+
+	if (!result) {
+		cout << "STATUS UPDATE FAILED!" << endl;
 	}
 
 	m_statusMessage = statusMessage;
@@ -123,11 +156,12 @@ void Settings::setStatusMessage(const QString& statusMessage)
 /*
  * Called when the user changes from BBM
  */
-void Settings::setStatusMessageFromBBM(bbm::UserStatus::Type statusType, const QString& statusMessage)
+void Settings::setStatusFromBBM(bbm::UserStatus::Type statusType, const QString& statusMessage)
 {
 	Q_UNUSED(statusType);
+	m_userStatus = statusType;
 	m_statusMessage = statusMessage;
-	emit statusMessageChangedFromBBM(statusMessage);
+	emit statusChangedFromBBM(statusType, statusMessage);
 }
 
 QString Settings::personalMessage()
@@ -164,7 +198,7 @@ void Settings::initUserProfileFromBBM()
 				this, SLOT(setDisplayNameFromBBM(const QString &)));
 		Q_ASSERT(result);
 		result = connect(m_userProfile, SIGNAL(statusUpdated(bb::platform::bbm::UserStatus::Type, const QString &)),
-				this, SLOT(setStatusMessageFromBBM(bb::platform::bbm::UserStatus::Type, const QString &)));
+				this, SLOT(setStatusFromBBM(bb::platform::bbm::UserStatus::Type, const QString &)));
 		Q_ASSERT(result);
 		result = connect(m_userProfile, SIGNAL(displayPictureUpdated(bb::platform::bbm::ImageType::Type, const QByteArray &)),
 				this, SLOT(setProfilePictureFromBBM(bb::platform::bbm::ImageType::Type, const QByteArray &)));
@@ -175,6 +209,7 @@ void Settings::initUserProfileFromBBM()
 
 		m_displayName = m_userProfile->displayName();
 		m_profilePicture = m_userProfile->displayPicture();
+		m_userStatus = m_userProfile->status();
 		m_statusMessage = m_userProfile->statusMessage();
 		m_personalMessage = m_userProfile->personalMessage();
 
@@ -244,10 +279,6 @@ void Settings::onCameraInvokeResult()
  */
 void Settings::cameraCardDone(const bb::system::CardDoneMessage& message)
 {
-	cout << "REASON: " << message.reason().toStdString() << endl;
-	cout << "MESSAGE: " << message.data().toStdString() << endl;
-	cout << "Type: " << message.dataType().toStdString() << endl;
-
 	// FIXME: this is an ugly hack. dataType is "" for FilePicker
 	// so I am checking that value to determine if I should create FilePicker
 	if (message.reason() == "save" && message.dataType() != "") {
@@ -275,29 +306,35 @@ void Settings::updateProfilePicture(const QStringList& images)
 		 */
 		QFile file(images.at(0));
 		if (!file.open(QIODevice::ReadOnly)) return;
-		const QByteArray imageData = file.readAll();
+		const QByteArray imageInByteArray = file.readAll();
 
+		QString imageFormat;
 		bbm::ImageType::Type imageType = bbm::ImageType::Unsupported;
 		if (images.at(0).endsWith(QLatin1String(".jpg"), Qt::CaseInsensitive) ||
 				images.at(0).endsWith(QLatin1String(".jpeg"), Qt::CaseInsensitive)) {
-			cout << "selected jpg" << endl;
+			imageFormat = "image/jpeg";
 			imageType = bb::platform::bbm::ImageType::Jpg;
 		} else if (images.at(0).endsWith(QLatin1String(".png"), Qt::CaseInsensitive)) {
+			imageFormat = "image/png";
 			imageType = bb::platform::bbm::ImageType::Png;
 		} else if (images.at(0).endsWith(QLatin1String(".gif"), Qt::CaseInsensitive)) {
+			imageFormat = "image/gif";
 			imageType = bb::platform::bbm::ImageType::Gif;
 		} else if (images.at(0).endsWith(QLatin1String(".bmp"), Qt::CaseInsensitive)) {
+			imageFormat = "image/bmp";
 			imageType = bb::platform::bbm::ImageType::Bmp;
 		}
 
-		bool result = m_userProfile->requestUpdateDisplayPicture(imageType, imageData);
+		QByteArray scaledImageInByteArray = Utility::scaleImage(imageInByteArray, 400, 400);
+
+		bool result = m_userProfile->requestUpdateDisplayPicture(imageType, scaledImageInByteArray);
 		if (!result) {
 			SystemToast toast;
 			toast.setBody("Failed to set Profile Picture!");
 			toast.exec();
 			return;
 		} else {
-			setProfilePicture(Image(images.at(0)));
+			setProfilePicture(Image(scaledImageInByteArray));
 			SystemToast toast;
 			toast.setBody("Profile Picture Updated Successfully.");
 			toast.exec();

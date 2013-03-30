@@ -33,6 +33,7 @@ signals:
 	void onSessionKeyChanged(const QString& sessionKey);
 	void onFriendListChanged(const QStringList &);
 	void onGetLocations(const QList<User> &);
+	void loginSuccess();
 	void loginFailed();
 
 public slots:

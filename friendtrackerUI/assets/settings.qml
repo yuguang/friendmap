@@ -1,6 +1,22 @@
 import bb.cascades 1.0
 import bb.cascades.pickers 1.0
 
+/**
+ * Settings Page
+ * 
+ * This page uses a sheet to get around a problem with embedding a tabbedPane in side navigationPane.
+ * 
+ * Operations Supported
+ * - change display picture
+ * - change status
+ * - change personal message
+ * - change visibility
+ * - change operation mode
+ * - change pull location frequency
+ * - change location update frequency
+ * 
+ * by Sukwon Oh
+ */
 Sheet {
     id: settingsSheet    
     content: TabbedPane {
@@ -142,51 +158,78 @@ Sheet {
                                     enabled: true
 
                                     property int initialized: 0
+                                    property int ignoreBBMUpdate: 0
 
                                     onCreationCompleted: {
-                                        if (_settings.statusMessage == "Available") {
-                                            selectedIndex = 0;
-                                        } else if (_settings.statusMessage == "Busy") {
-                                            selectedIndex = 1;
-                                        } else {
+                                        if (_settings.statusMessage != "") {
                                             customStatusMessage.text = _settings.statusMessage;
-                                            selectedIndex = 2;
+                                            customStatusMessage.selected = true;
+                                        } else {
+                                            if (_settings.userStatus == 1) {
+                                                availableOption.selected = true;
+                                            } else {
+                                                busyOption.selected = true;
+                                            }
                                         }
-                                        _settings.statusMessageChangedFromBBM.connect(
-                                            statusMessageDropDown.selectedValueChanged);
+                                        
+                                        _settings.statusChangedFromBBM.connect(
+                                            statusMessageDropDown.updateUserStatus);
                                         initialized = 1;
                                     }
-
-                                    function selectedValueChanged(val) {
-                                        if (val == "available") {
-                                            selectedIndex = 0;
-                                        } else if (val == "busy") {
-                                            selectedIndex = 1;
-                                        } else {
+                                    
+                                    function updateUserStatus(type, val) {
+                                        // ignore update from BBM that was from radio button update
+                                        if (ignoreBBMUpdate == 1) {
+                                            ignoreBBMUpdate = 0;
+                                            return;
+                                        }
+                                        if (val != "") {
                                             customStatusMessage.text = val;
-                                            selectedIndex = 2;
+                                            customStatusMessage.selected = true;
+                                        } else {
+                                            if (type == 1) {
+                                                availableOption.selected = true;
+                                            } else {
+                                                busyOption.selected = true;
+                                            }
                                         }
                                     }
-
-                                    onSelectedOptionChanged: {
+                                    
+                                    onSelectedIndexChanged: {
                                         if (initialized == 1) {
-                                            // signals BBM about the changes made
-                                            _settings.statusMessage = selectedOption.value;
+                                            if (selectedIndex == 0) {
+                                                _settings.setStatus(1, "Available");
+                                                ignoreBBMUpdate = 1;
+                                                customMessageBox.visible = false;
+                                            } else if (selectedIndex == 1) {
+                                                _settings.setStatus(2, "Busy");
+                                                ignoreBBMUpdate = 1;
+                                                customMessageBox.visible = false;
+                                            } else {
+                                                customMessageBox.visible = true;
+                                            }
                                         }
                                     }
 
                                     Option {
+                                        id: availableOption
                                         text: "Available"
-                                        value: "available"
+                                        value: "Available"
                                     }
                                     Option {
+                                        id: busyOption
                                         text: "Busy"
-                                        value: "busy"
+                                        value: "Busy"
                                     }
                                     Option {
                                         id: customStatusMessage
                                         text: "Edit Status Message"
                                     }
+                                }
+                                
+                                TextField {
+                                    id: customMessageBox
+                                    visible: false
                                 }
 
                                 Label {
@@ -206,7 +249,7 @@ Sheet {
                                     onClicked: {
                                         _settings.personalMessage = personalMessage.text;
                                     }
-                                }
+                                }                                
                                 // placeholder so that keyboard won't hide PersonalMessage textarea
                                 Label {
                                     text: ""
@@ -301,6 +344,28 @@ Sheet {
                             }
                         }
                     }
+                    
+                    actions: [
+                        ActionItem {
+                            title: "Default"
+                            ActionBar.placement: ActionBarPlacement.OnBar
+                            onTriggered: {
+                                // reset visibility
+                                visibility.checked = true;
+                                _friendtracker.saveValueFor(visibility.objectName, visibility.checked);
+                                // reset real-time mode
+                                mode.checked = true;
+                                _friendtracker.saveValueFor(mode.objectName, mode.checked);
+                                // reset pull frequency
+                                pullFrequency.value = 5;
+                                _friendtracker.saveValueFor(pullFrequency.objectName, pullFrequency.value);
+                                // reset update frequency
+                                updateFrequency.value = 5;
+                                _friendtracker.saveValueFor(updateFrequency.objectName, updateFrequency.value);
+                            }
+                        }
+                    ] // actions
+                    
                     Container {
                         //background: Color.Black
                         layout: StackLayout {}
@@ -341,7 +406,7 @@ Sheet {
                                 id: mode
                                 objectName: "mode"
                                 checked: _friendtracker.getValueFor(mode.objectName, "true")
-                                horizontalAlignment: HorizontalAlignment.Right
+                                horizontalAlignment: HorizontalAlignment.Right                            
                                 
                                 onCheckedChanged: {
                                     if (!checked) {
@@ -449,7 +514,7 @@ Sheet {
                                     // change update location interval
                                     _mapView.setGeoLocationInterval(updateFrequency.value);
                                 }
-                            }
+                            }                                                    
                         }
                     }
                 }

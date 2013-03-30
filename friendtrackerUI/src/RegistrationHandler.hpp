@@ -1,18 +1,8 @@
-/* Copyright (c) 2012 Research In Motion Limited.
+/**
+ * Connect to BBM
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * by Sukwon Oh
  */
-
 #ifndef REGISTRATIONHANDLER_HPP
 #define REGISTRATIONHANDLER_HPP
 
@@ -23,7 +13,6 @@
 #include <QtCore/QObject>
 #include <QUuid>
 
-#include "WebMaps.hpp"
 #include "ServerInterface.h"
 
 /**
@@ -69,7 +58,7 @@ public:
      * @param uuid The unique ID of the application
      * @param parent The parent object
      */
-    RegistrationHandler(const QUuid &uuid, WebMaps* webMaps, QObject *parent = 0);
+    RegistrationHandler(const QUuid &uuid, QObject *parent = 0);
 
     /**
      * Returns the BBM context that is associated with this application.
@@ -149,8 +138,6 @@ private:
 
     // A status message that describes the current state of registration.
     QString m_statusMessage;
-
-    WebMaps* m_webMaps;
 };
 
 #endif
