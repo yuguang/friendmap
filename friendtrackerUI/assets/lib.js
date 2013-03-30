@@ -55,13 +55,13 @@ function startSubscription(friends, websocketView) {
     	return _results;
     };
     socket.onmessage = function(message) {
-    	console.log(message.data);
+    	//console.log(message.data);
     	if (message == null) {
     		console.log("data NULL!");
     	}
     	var data = decodeJSON(message);
     	if (data) {
-    		console.log(socket + " user: " + data.user + " x:" + data.location.x + " y:" + data.location.y);
+    		//console.log(socket + " user: " + data.user + " x:" + data.location.x + " y:" + data.location.y);
     		return websocketView.updateUserLocation(data.user, data.location.x, data.location.y);    		
     	}
     };

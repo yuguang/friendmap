@@ -9,12 +9,14 @@ device {
 
         LIBS += -lQtCore
 
-        SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/FriendItem.cpp) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
+                 $$quote($$BASEDIR/src/MockFriendItem.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.cpp) \
                  $$quote($$BASEDIR/src/ServerInterface.cpp) \
@@ -27,6 +29,7 @@ device {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendItem.hpp) \
                  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
@@ -34,6 +37,7 @@ device {
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \
+                 $$quote($$BASEDIR/src/MockFriendItem.hpp) \
                  $$quote($$BASEDIR/src/Profile.hpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.hpp) \
                  $$quote($$BASEDIR/src/Reply.h) \
@@ -53,12 +57,14 @@ device {
 
         LIBS += -lQtCore
 
-        SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/FriendItem.cpp) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
+                 $$quote($$BASEDIR/src/MockFriendItem.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.cpp) \
                  $$quote($$BASEDIR/src/ServerInterface.cpp) \
@@ -71,6 +77,7 @@ device {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendItem.hpp) \
                  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
@@ -78,6 +85,7 @@ device {
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \
+                 $$quote($$BASEDIR/src/MockFriendItem.hpp) \
                  $$quote($$BASEDIR/src/Profile.hpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.hpp) \
                  $$quote($$BASEDIR/src/Reply.h) \
@@ -99,12 +107,14 @@ simulator {
 
         LIBS += -lQtCore
 
-        SOURCES +=  $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/FriendItem.cpp) \
+                 $$quote($$BASEDIR/src/FriendtrackerUI.cpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.cpp) \
                  $$quote($$BASEDIR/src/GetLocationsReply.cpp) \
                  $$quote($$BASEDIR/src/LoginMessage.cpp) \
                  $$quote($$BASEDIR/src/LoginReply.cpp) \
+                 $$quote($$BASEDIR/src/MockFriendItem.cpp) \
                  $$quote($$BASEDIR/src/Profile.cpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.cpp) \
                  $$quote($$BASEDIR/src/ServerInterface.cpp) \
@@ -117,6 +127,7 @@ simulator {
                  $$quote($$BASEDIR/src/main.cpp)
 
         HEADERS +=  $$quote($$BASEDIR/src/Exceptions.h) \
+                 $$quote($$BASEDIR/src/FriendItem.hpp) \
                  $$quote($$BASEDIR/src/FriendtrackerUI.hpp) \
                  $$quote($$BASEDIR/src/GetAddressHelper.h) \
                  $$quote($$BASEDIR/src/GetLocationsMessage.h) \
@@ -124,6 +135,7 @@ simulator {
                  $$quote($$BASEDIR/src/LoginMessage.h) \
                  $$quote($$BASEDIR/src/LoginReply.h) \
                  $$quote($$BASEDIR/src/Message.h) \
+                 $$quote($$BASEDIR/src/MockFriendItem.hpp) \
                  $$quote($$BASEDIR/src/Profile.hpp) \
                  $$quote($$BASEDIR/src/RegistrationHandler.hpp) \
                  $$quote($$BASEDIR/src/Reply.h) \

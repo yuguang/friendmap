@@ -78,6 +78,14 @@
     </message>
 </context>
 <context>
+    <name>friendlist</name>
+    <message>
+        <location filename="../assets/friendlist.qml" line="44"/>
+        <source>pin:2A91A09F</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>registration</name>
     <message>
         <location filename="../assets/registration.qml" line="45"/>

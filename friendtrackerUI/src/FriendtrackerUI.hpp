@@ -23,8 +23,19 @@
 #include <QtLocationSubset/QGeoCoordinate>
 
 // forward decl
-namespace bb { namespace cascades { class Application; }}
-namespace bb { namespace platform { namespace bbm { class ContactService; }}}
+namespace bb {
+	namespace cascades {
+		class Application;
+		class GroupDataModel;
+	}
+}
+namespace bb {
+	namespace platform {
+		namespace bbm {
+			class ContactService;
+		}
+	}
+}
 
 using namespace bb::platform::bbm;
 using namespace QtMobilitySubset;
@@ -41,6 +52,7 @@ class FriendtrackerUI : public QObject
      * List of user's friends ppIds
      */
     Q_PROPERTY(QStringList onlinePpIds READ onlinePpIds WRITE setOnlinePpIds NOTIFY onlinePpIdsChanged)
+    Q_PROPERTY(bb::cascades::GroupDataModel* friendListModel READ friendListModel)
 
 public:
     FriendtrackerUI(bb::cascades::Application *app, const QString& uuid);
@@ -162,6 +174,12 @@ public Q_SLOTS:
 	 * returns friend's display picture from askFriendProfilePicture request
 	 */
 	void returnFriendDisplayPicture(const QString &, const bb::platform::bbm::ImageType::Type, const QByteArray &);
+
+	/*
+	 * populates a GroupDataModel of the user's friend list on qml side
+	 */
+	bb::cascades::GroupDataModel* friendListModel();
+
 
 private:
 	/*

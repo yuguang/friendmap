@@ -5,6 +5,10 @@
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/AbstractPane>
 #include <bb/cascades/Image>
+#include <bb/cascades/Sheet>
+#include <bb/cascades/Page>
+#include <bb/cascades/NavigationPane>
+#include <bb/cascades/GroupDataModel>
 #include <bb/platform/bbm/ContactService>
 #include <bb/platform/bbm/Contact>
 #include <bb/platform/bbm/UserProfile>
@@ -24,6 +28,8 @@
 #include "ServerInterface.h"
 #include "Utility.h"
 #include "GetAddressHelper.h"
+#include "FriendItem.hpp"
+#include "MockFriendItem.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -307,6 +313,29 @@ void FriendtrackerUI::saveUserProfilePicture(const QByteArray& imageData)
 	}
 }
 
+/*
+ * populate GroupDataModel on qml side
+ */
+GroupDataModel* FriendtrackerUI::friendListModel()
+{
+	GroupDataModel* groupDataModel = new GroupDataModel(QStringList() << "displayName");
+
+	QList<Contact> contacts = m_contactService->contacts();
+	for (QList<Contact>::iterator it = contacts.begin(); it != contacts.end(); ++it) {
+		cout << "POPULATE: " << it->displayName().toStdString() << endl;
+		groupDataModel->insert(new FriendItem(this, *it, m_contactService));
+	}
+
+	// Only for testing scenario
+	groupDataModel->insert(new MockFriendItem(this, "testusr1", UserStatus::Available, "Available", "I am testusr1!"));
+	groupDataModel->insert(new MockFriendItem(this, "testusr2", UserStatus::Available, "Available", "cool weather!"));
+	groupDataModel->insert(new MockFriendItem(this, "testusr3", UserStatus::Available, "Available", "I'm hungry!"));
+
+	cout << "POPULATED" << endl;
+
+	return groupDataModel;
+}
+
 void FriendtrackerUI::loadMap()
 {
 	cout << "loadMap started" << endl;
@@ -326,7 +355,7 @@ void FriendtrackerUI::loadMap()
     qml->setContextProperty("_friendtracker", this);
 
     // create root object for the UI
-    AbstractPane *root = qml->createRootObject<AbstractPane>();
+    NavigationPane *root = qml->createRootObject<NavigationPane>();
     // set created root object as a scene
     m_app->setScene(root);
 }

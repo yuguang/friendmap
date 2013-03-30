@@ -1,0 +1,93 @@
+/**
+ * ListView for display friends list
+ * 
+ * by Sukwon Oh
+ */
+
+import bb.cascades 1.0
+
+Page {
+    titleBar: TitleBar {
+        title: "Friends"
+    }
+
+    attachedObjects: [
+        Invocation {
+            id: chat
+            query: InvokeQuery {
+                id: chatQuery
+                invokeTargetId: "sys.bbm.sharehandler"
+            }
+        }
+    ]
+
+    ListView {
+        dataModel: _friendtracker.friendListModel
+
+        listItemComponents: [
+            ListItemComponent {
+                type: "listItem"
+
+                StandardListItem {
+                    title: ListItemData.displayName
+                    description: ListItemData.personalMessage
+                    status: ListItemData.statusMessage
+                    image: ListItemData.profilePicture
+                    
+                    contextActions: [
+                        ActionSet {
+                            title: "Contact"
+                            InvokeActionItem {
+                                title: "Start a Chat"
+                                imageSource: "asset:///images/chat.png"
+                                query {
+                                    uri: qsTr("pin:2A91A09F")
+                                    invokeTargetId: "sys.bbm.sharehandler"
+                                    invokeActionId: "bb.action.BBMCHAT"
+                                }
+                            }
+                            InvokeActionItem {
+                                title: "Send an Email"
+                                imageSource: "asset:///images/email.png"
+                                query {
+                                    invokeTargetId: "sys.pim.uib.email.hybridcomposer"
+                                    invokeActionId: "bb.action.OPEN, bb.action.SENDEMAIL"
+                                    uri: "mailto:test@gmail.com"
+                                }
+                            }
+                        }
+                    ]                                
+                }
+            }
+        ]
+        
+        /*
+         * Center the map to the friend
+         */
+        onTriggered: {
+            var selectedItem = dataModel.data(indexPath);
+            var marker = _mapView.getPin(selectedItem.ppId);
+            if (marker != null) {
+                mapview.latitude = marker.lat;
+                mapview.longitude = marker.lon;
+            }
+            navigationPane.pop();
+        }
+
+        // Override the itemType() function to return the proper type
+        // for each item in the list. Because a GroupDataModel has only
+        // two levels, use the index path to determine whether the item
+        // is a header item or a list item.
+        function itemType(data, indexPath) {
+            if (indexPath.length == 1) {
+                // If the index path contains a single integer, the item
+                // is a "header" type item
+                return "header";
+            } else {
+                // If the index path contains more than one integer, the
+                // item is a "listItem" type item
+                return "listItem";
+            }
+        }
+    }
+}

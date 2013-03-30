@@ -8,7 +8,8 @@ import bb.system 1.0
 import bb.cascades.maps 1.0
 
 NavigationPane {
-    id: navigationPane        
+    id: navigationPane    
+    objectName: "navigationPane"
     Menu.definition: MenuDefinition {
         // help action
         actions: [
@@ -50,11 +51,11 @@ NavigationPane {
             },
             ActionItem {
                 title: "Friends"
-                imageSource: "asset:///images/chat.png"
+                imageSource: "asset:///images/friends.png"
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
                     console.log("showing friends javascript");
-                    chatSheet.open();
+                    navigationPane.push(friendListPage.createObject());
                 }
             }
         ]        
@@ -131,6 +132,7 @@ NavigationPane {
                 overlapTouchPolicy: OverlapTouchPolicy.Allow
                 property variant currentBubble: null
                 property variant me
+                property variant locations: {}
                 layout: AbsoluteLayout {
                 }
                 
@@ -180,7 +182,7 @@ NavigationPane {
                     marker.y = xy[1];
                     if (isNew) {
                         pinContainer.add(marker);
-                        marker.animDrop.play();
+                        //marker.animDrop.play();
                     }                    
                     _mapView.addPin(ppId, marker);                    
                 }
@@ -315,7 +317,7 @@ NavigationPane {
                         var data = message.data.substring(message.data.indexOf(":") + 1);
                         var values = data.split(",");
                         var ppId = values[0].substr(1);
-                        console.log("ppId: " + ppId + "@" + values[1] + "," + values[2]);
+                        //console.log("ppId: " + ppId + "@" + values[1] + "," + values[2]);
                         pinContainer.addPin(ppId, values[1], values[2]);
                     }
                 }
@@ -344,6 +346,10 @@ NavigationPane {
                     infoSheet.close();
                 }
             }
+        },
+        ComponentDefinition {
+            id: friendListPage
+            source: "friendlist.qml"
         }
     ]
 }

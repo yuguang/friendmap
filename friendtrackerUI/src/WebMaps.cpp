@@ -264,6 +264,7 @@ double WebMaps::getMyLongitude() const
 void WebMaps::showFriends()
 {
 	// bring up bbm chat (just forn now)
+	cout << "BBM CHAT!!!!" << endl;
 	InvokeManager invokeManager(this);
 	InvokeRequest request;
 	request.setTarget("sys.bbm.sharehandler");
