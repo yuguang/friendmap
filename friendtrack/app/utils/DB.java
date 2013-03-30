@@ -35,7 +35,7 @@ public class DB {
     }
 
     public boolean insertUser(User user) throws SQLException {
-        String query = "replace into user(ppId,x,y) values (?,?,?)";
+        String query = "replace into user(ppId,x,y,visibility) values (?,?,?,?)";
         PreparedStatement st = getConnection().prepareStatement(query);
         st.setString(1, user.getppId());
         st.setDouble(2, user.getX());

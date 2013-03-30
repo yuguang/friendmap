@@ -17,6 +17,7 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import utils.Redis;
+//import utils.Channel;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +48,30 @@ public class Application extends Controller {
             Logger.error("execution exception " + userId + " " + e.getMessage());
         }
     }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result getLocations() {
+        String ipAddress = request().remoteAddress();
+        JsonNode inputs = request().body().asJson();
+
+        Logger.info("received " + inputs.toString() + " from " + ipAddress);
+
+        // request format: "friends": [ ppId1, ppId2, ... ]
+        // reply format: "location: [ {"ppId": ppId1, "x": x, "y": y, "v": 1}, ... ]
+        ObjectNode reply = Json.newObject();
+        reply.put("type", "location");
+        reply.put("status", "OK");
+        ArrayNode body = reply.putArray("friends");
+        int count = 0;
+        for (JsonNode friend : inputs.findPath("friends")) {
+            String val = Redis.getInstance().getSync(friend.getTextValue());
+            if (val != null) {
+                body.add(val);
+            }
+        }
+        return ok(reply);
+    }
+
         
     @BodyParser.Of(BodyParser.Json.class)
     public static WebSocket<JsonNode> index() {

@@ -36,6 +36,7 @@ public class Application extends Controller {
         double y = inputs.findPath("y").getDoubleValue();
 
         ObjectNode reply = Json.newObject();
+        reply.put("type", "login");
         User user = null;
         try {
             user = DB.getInstance().getUser(ppid);
@@ -48,6 +49,7 @@ public class Application extends Controller {
             try {
                 user.save(true);
             } catch (Exception e2) {
+                Logger.info("error - " + e2.getMessage());
                 reply.put("status", "FAIL");
                 return ok(reply);
             }
@@ -92,6 +94,7 @@ public class Application extends Controller {
 
         Object obj = Cache.get(sessionKey);
         ObjectNode reply = Json.newObject();
+        reply.put("type", "update");
         if (((String)obj).equals(ppid)) {
             StringBuilder location = new StringBuilder();
             location.append(Double.toString(x));

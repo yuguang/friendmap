@@ -4,6 +4,7 @@ import play.*;
 import play.mvc.*;
 
 import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.RedisConnection;
 import com.lambdaworks.redis.RedisAsyncConnection;
 import com.lambdaworks.redis.pubsub.RedisPubSubConnection;
 
@@ -19,6 +20,7 @@ public class Redis {
 
     private static Redis instance = null;
     private RedisClient client = null;
+    private RedisConnection<String, String> syncConn = null;
     private RedisAsyncConnection<String, String> asyncConn = null;
     private RedisPubSubConnection<String, String> pubsubConn = null;
 
@@ -38,9 +40,12 @@ public class Redis {
 
     private Redis() {
         client = new RedisClient("127.0.0.1", 6379);
-        // initialize both async and pubsub connections
+        // initialize all synch, async and pubsub connections
+        syncConn = client.connect();
+        String status = syncConn.auth("friendtracker-pass");
+        Logger.debug("syncConn auth status - " + status);
         asyncConn = client.connectAsync();
-        String status = asyncConn.auth("friendtracker-pass");
+        status = asyncConn.auth("friendtracker-pass");
         Logger.debug("asyncConn auth status - " + status);
         pubsubConn = client.connectPubSub();
         status = pubsubConn.auth("friendtracker-pass");
@@ -54,6 +59,10 @@ public class Redis {
 
     public Future<String> get(String key) {
         return asyncConn.get(key);
+    }
+
+    public String getSync(String key) {
+        return syncConn.get(key);
     }
 
     public void publish(String key, String message) {

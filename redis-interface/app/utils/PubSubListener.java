@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import utils.Channel;
+
 public class PubSubListener implements RedisPubSubListener<String, String> {
 
     // use unlimited thread pool with garbage collections (reaping unused threads)
@@ -36,23 +38,28 @@ public class PubSubListener implements RedisPubSubListener<String, String> {
     }
 
     @Override
-    public void message(final String channel, String message) {
+    public void message(final String channel, final String message) {
         // construct json response
         final ObjectNode reply = Json.newObject();
         ArrayNode body = reply.putArray("SUBSCRIBE");
         body.add("message");
         body.add(channel);
         body.add(message);
+        String[] fields = message.split(",");
+        String v = fields[2];
 
-        executor.execute(new Runnable() {
-            public void run() {
-                HashSet<WebSocket.Out<JsonNode>> websockets = getWebSockets(channel);
-
-                for (WebSocket.Out<JsonNode> out : websockets) {
-                    out.write(reply);
+//        if(v == "1"){
+            executor.execute(new Runnable() {
+                public void run() {
+                    HashSet<WebSocket.Out<JsonNode>> websockets = getWebSockets(channel);
+            
+                    for (WebSocket.Out<JsonNode> out : websockets) {
+                        //Logger.info("channel: " + channel + " message: " + message);
+                        out.write(reply);
+                    }
                 }
-            }
-        });
+            });
+//        }
     }
 
     @Override
@@ -73,7 +80,7 @@ public class PubSubListener implements RedisPubSubListener<String, String> {
                 HashSet<WebSocket.Out<JsonNode>> websockets = getWebSockets(channel);
 
                 for (WebSocket.Out<JsonNode> out : websockets) {
-                    out.write(reply);
+                        out.write(reply);
                 }
             }
         });

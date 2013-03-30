@@ -63,27 +63,27 @@ def publisher_thread(user_ppid):
         while start_pos == dest_pos:
             dest_pos = random.randint(0, num_locations-1)
 
-        print ppid + " Driving from " + loc_print[start_pos] + " to " + loc_print[dest_pos]
+#        print ppid + " Driving from " + loc_print[start_pos] + " to " + loc_print[dest_pos]
         dist = get_distance(locations[start_pos], locations[dest_pos])
         cur_location = locations[start_pos]
         lat_diff = locations[dest_pos][0] - locations[start_pos][0]
         lon_diff = locations[dest_pos][1] - locations[start_pos][1]
         travel_time = dist / speed[1] * 3600      # estimated walking time
-        print "expected travel time " + str(travel_time) + " sec"
+#        print "expected travel time " + str(travel_time) + " sec"
         while get_distance(cur_location, locations[dest_pos]) <= dist:
-            r.set(ppid, str(cur_location[0]) + "," + str(cur_location[1]))
-            r.publish(ppid, str(cur_location[0]) + "," + str(cur_location[1]))
-            print ppid + " " + str(cur_location)
+            r.set(ppid, str(cur_location[0]) + "," + str(cur_location[1]) + ",1")
+            r.publish(ppid, str(cur_location[0]) + "," + str(cur_location[1]) + ",1")
+            #print ppid + " " + str(cur_location)
             dist = get_distance(cur_location, locations[dest_pos])
-            time.sleep(0.5)   # wait 5 sec
+            time.sleep(1)   # wait 5 sec
             cur_location[0] += lat_diff * 5 / travel_time
             cur_location[1] += lon_diff * 5 / travel_time
             #print "distance " + str(get_distance(cur_location, locations[dest_pos]))
 
-        r.set(ppid, str(locations[dest_pos][0]) + "," + str(locations[dest_pos][1]))
-        r.publish(ppid, str(locations[dest_pos][0]) + "," + str(locations[dest_pos][1]))
+        r.set(ppid, str(locations[dest_pos][0]) + "," + str(locations[dest_pos][1]) + ",1")
+        r.publish(ppid, str(locations[dest_pos][0]) + "," + str(locations[dest_pos][1]) + ",1")
 
-        print ppid + " arrived at " + loc_print[dest_pos] + str(locations[dest_pos])
+#        print ppid + " arrived at " + loc_print[dest_pos] + str(locations[dest_pos])
         start_pos = dest_pos
 
 try:
