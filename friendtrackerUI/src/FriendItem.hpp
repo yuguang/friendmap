@@ -24,9 +24,11 @@ class FriendItem : public QObject
 	Q_PROPERTY(QString statusMessage READ statusMessage FINAL)
 	Q_PROPERTY(QString personalMessage READ personalMessage FINAL)
 	Q_PROPERTY(QString ppId READ ppId FINAL)
+	Q_PROPERTY(QString pin READ pin FINAL)
 
 public:
-	FriendItem(QObject* parent, bb::platform::bbm::Contact& contact, bb::platform::bbm::ContactService* contactService);
+	FriendItem(QObject* parent, bb::platform::bbm::Contact& contact, bb::platform::bbm::ContactService* contactService,
+			const QString& pin);
 	virtual ~FriendItem() {}
 
 	QString displayName() const;
@@ -35,6 +37,7 @@ public:
 	QString statusMessage() const;
 	QString personalMessage() const;
 	QString ppId() const;
+	QString pin() const;
 
 public Q_SLOTS:
 	void updateFriendDisplayPicture(const QString &, const bb::platform::bbm::ImageType::Type, const QByteArray &);
@@ -49,6 +52,7 @@ private:
 	QString m_statusMessage;
 	QString m_personalMessage;
 	QString m_ppId;
+	QString m_pin;
 };
 
 

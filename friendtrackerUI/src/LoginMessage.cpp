@@ -14,15 +14,17 @@ QUrl LoginMessage::url = QUrl("http://friendtracker.org:9000/login");
 
 LoginMessage::LoginMessage(const QString& ppId,
 						   double lat,
-						   double lon)
-: m_ppId(ppId), latitude(lat), longitude(lon)
+						   double lon,
+						   const QString& devicePin)
+: m_ppId(ppId), latitude(lat), longitude(lon), m_devicePin(devicePin)
 {}
 
 LoginMessage::LoginMessage(const QString& ppId,
 						   double lat,
 						   double lon,
+						   const QString& devicePin,
 						   const QStringList& friends)
-: m_ppId(ppId), latitude(lat), longitude(lon), friends(friends)
+: m_ppId(ppId), latitude(lat), longitude(lon), m_devicePin(devicePin), friends(friends)
 {}
 
 QByteArray LoginMessage::serialize() const
@@ -31,9 +33,10 @@ QByteArray LoginMessage::serialize() const
 	jsonStream << "{\"ppId\":\"" << m_ppId.toStdString()
 			   << "\",\"x\":" << latitude
 			   << ",\"y\":" << longitude
-			   << ",\"friends\":[";
+			   << ",\"pin\":\"" << m_devicePin.toStdString()
+			   << "\",\"friends\":[";
 
-	for (unsigned int i = 0; i < friends.size(); i++) {
+	for (int i = 0; i < friends.size(); i++) {
 		if (i > 0) jsonStream << ",";
 		jsonStream << "\"" << friends.at(i).toStdString() << "\"";
 	}

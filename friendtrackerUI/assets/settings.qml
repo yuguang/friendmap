@@ -56,6 +56,7 @@ Sheet {
             id: profileTab
             title: qsTr("Profile Settings")
             description: "Profile Settings"
+            imageSource: "asset:///images/device.png"
             property alias navHandle: nav1
             NavigationPane {
                 id: nav1
@@ -82,6 +83,7 @@ Sheet {
                         ActionItem {
                             title: "Take Picture"
                             ActionBar.placement: ActionBarPlacement.OnBar
+                            imageSource: "asset:///images/Camera2.png"
                             onTriggered: {
                                 _settings.openCamera()
                             }
@@ -89,6 +91,7 @@ Sheet {
                         ActionItem {
                             title: "Pick Picture"
                             ActionBar.placement: ActionBarPlacement.OnBar
+                            imageSource: "asset:///images/tab.png"
                             onTriggered: {
                                 filePicker.open()
                             }
@@ -323,7 +326,7 @@ Sheet {
             property alias navHandle: nav2
             title: qsTr("Server Settings")
             description: "Server Settings"
-
+            imageSource: "asset:///images/server.png"
             NavigationPane {
                 id: nav2
 

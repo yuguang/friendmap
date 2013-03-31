@@ -22,6 +22,7 @@ class MockFriendItem : public QObject
 	Q_PROPERTY(QString statusMessage READ statusMessage NOTIFY statusMessageChanged)
 	Q_PROPERTY(QString personalMessage READ personalMessage NOTIFY personalMessageChanged)
 	Q_PROPERTY(QString ppId READ ppId)
+	Q_PROPERTY(QString pin READ pin)
 
 public:
 	MockFriendItem(QObject* parent,
@@ -38,6 +39,7 @@ public:
 	QString statusMessage() const;
 	QString personalMessage() const;
 	QString ppId() const;
+	QString pin() const;
 
 signals:
 	void displayNameChanged(const QString& name);
@@ -53,6 +55,7 @@ private:
 	QString m_statusMessage;
 	QString m_personalMessage;
 	QString m_ppId;
+	QString m_pin;
 };
 
 

@@ -14,87 +14,56 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="142"/>
+        <location filename="../src/RegistrationHandler.cpp" line="143"/>
         <source>Disconnected by RIM. RIM is preventing this application from connecting to BBM.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="148"/>
+        <location filename="../src/RegistrationHandler.cpp" line="149"/>
         <source>Disconnected. Go to Settings -&gt; Security and Privacy -&gt; Application Permissions and connect this application to BBM.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="156"/>
+        <location filename="../src/RegistrationHandler.cpp" line="157"/>
         <source>Invalid UUID. Report this error to the vendor.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="162"/>
+        <location filename="../src/RegistrationHandler.cpp" line="163"/>
         <source>Too many applications are connected to BBM. Uninstall one or more applications and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="170"/>
+        <location filename="../src/RegistrationHandler.cpp" line="171"/>
         <source>Cannot connect to BBM. Download this application from AppWorld to keep using it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="176"/>
+        <location filename="../src/RegistrationHandler.cpp" line="177"/>
         <source>Check your Internet connection and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="183"/>
+        <location filename="../src/RegistrationHandler.cpp" line="184"/>
         <source>Connecting to BBM. Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="188"/>
+        <location filename="../src/RegistrationHandler.cpp" line="189"/>
         <source>Determining the status. Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/RegistrationHandler.cpp" line="198"/>
+        <location filename="../src/RegistrationHandler.cpp" line="199"/>
         <source>Would you like to connect the application to BBM?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>WebMaps</name>
-    <message>
-        <location filename="../src/WebMaps.cpp" line="47"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/WebMaps.cpp" line="46"/>
-        <source>Initializing Friend Tracker...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/WebMaps.cpp" line="242"/>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>friendlist</name>
-    <message>
-        <location filename="../assets/friendlist.qml" line="44"/>
-        <source>pin:2A91A09F</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>registration</name>
     <message>
-        <location filename="../assets/registration.qml" line="45"/>
+        <location filename="../assets/registration.qml" line="47"/>
         <source>Connect to BBM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../assets/registration.qml" line="54"/>
-        <source>Continue</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -106,7 +75,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/settings.qml" line="324"/>
+        <location filename="../assets/settings.qml" line="327"/>
         <source>Server Settings</source>
         <translation type="unfinished"></translation>
     </message>

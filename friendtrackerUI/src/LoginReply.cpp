@@ -34,6 +34,10 @@ bool LoginReply::parse(const QByteArray& data)
 			for (int i = 0; i < friendList.size(); i++) {
 				m_ppIds.append(friendList[i].toString());
 			}
+			QVariantList pinList = map["pins"].value<QVariantList>();
+			for (int i = 0; i < pinList.size(); i++) {
+				m_pins.append(pinList[i].toString());
+			}
 
 			return true;
 		}
@@ -56,4 +60,9 @@ QString LoginReply::getSessionKey() const
 QStringList LoginReply::getFriends() const
 {
 	return m_ppIds;
+}
+
+QStringList LoginReply::getPins() const
+{
+	return m_pins;
 }

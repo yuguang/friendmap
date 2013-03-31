@@ -83,6 +83,7 @@ void ServerInterface::parseReply(QNetworkReply* reply)
 				if (reply->getType() == "login") {
 					emit onSessionKeyChanged(dynamic_cast<LoginReply *>(reply)->getSessionKey());
 					emit onFriendListChanged(dynamic_cast<LoginReply *>(reply)->getFriends());
+					emit onPinListChanged(dynamic_cast<LoginReply *>(reply)->getPins());
 					m_isLoggedIn = true;
 				} else if (reply->getType() == "location") {
 					emit onGetLocations(dynamic_cast<GetLocationsReply *>(reply)->getFriends());

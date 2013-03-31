@@ -19,6 +19,7 @@
 #include <bb/system/SystemToast>
 #include <bb/ImageData>
 #include <bb/utility/ImageConverter>
+#include <bb/device/HardwareInfo>
 
 #include <QSettings>
 
@@ -79,6 +80,13 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 			SLOT(setOnlinePpIds(const QStringList &)));
 	Q_ASSERT(connected);
 
+	// get pinlist from login
+	connected = QObject::connect(m_serverInterface,
+			SIGNAL(onPinListChanged(const QStringList &)),
+			this,
+			SLOT(setPins(const QStringList &)));
+	Q_ASSERT(connected);
+
 	connected = QObject::connect(m_serverInterface,
 			SIGNAL(loginFailed()),
 			this,
@@ -127,9 +135,11 @@ void FriendtrackerUI::initMap()
 
 void FriendtrackerUI::login(const QGeoCoordinate& coord)
 {
+	bb::device::HardwareInfo hardwareInfo;
 	LoginMessage msg(m_profile->ppId(),
 			coord.latitude(),
 			coord.longitude(),
+			hardwareInfo.pin(),
 			m_ppIds);
 
 	m_serverInterface->sendMessage(msg);
@@ -160,9 +170,33 @@ void FriendtrackerUI::setOnlinePpIds(const QStringList& ppIds)
 	m_onlinePpIds.append(QString("testusr3"));
 }
 
+void FriendtrackerUI::setPins(const QStringList& pins)
+{
+	m_pins = pins;
+	m_pins.append(QString("testpin1"));
+	m_pins.append(QString("testpin2"));
+	m_pins.append(QString("testpin3"));
+}
+
 QStringList FriendtrackerUI::onlinePpIds()
 {
 	return m_onlinePpIds;
+}
+
+QStringList FriendtrackerUI::pins()
+{
+	return m_pins;
+}
+
+QString FriendtrackerUI::getPin(const QString& ppId)
+{
+	for (int i = 0; i < m_onlinePpIds.size(); i++) {
+		if (m_onlinePpIds.at(i) == ppId) {
+			return m_pins.at(i);
+		}
+	}
+
+	return "";
 }
 
 void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
@@ -323,7 +357,7 @@ GroupDataModel* FriendtrackerUI::friendListModel()
 	QList<Contact> contacts = m_contactService->contacts();
 	for (QList<Contact>::iterator it = contacts.begin(); it != contacts.end(); ++it) {
 		cout << "POPULATE: " << it->displayName().toStdString() << endl;
-		groupDataModel->insert(new FriendItem(this, *it, m_contactService));
+		groupDataModel->insert(new FriendItem(this, *it, m_contactService, getPin(it->ppId())));
 	}
 
 	// Only for testing scenario

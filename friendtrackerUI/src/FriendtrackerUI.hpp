@@ -52,11 +52,14 @@ class FriendtrackerUI : public QObject
      * List of user's friends ppIds
      */
     Q_PROPERTY(QStringList onlinePpIds READ onlinePpIds WRITE setOnlinePpIds NOTIFY onlinePpIdsChanged)
+    Q_PROPERTY(QStringList pins READ pins WRITE setPins NOTIFY pinsChanged)
     Q_PROPERTY(bb::cascades::GroupDataModel* friendListModel READ friendListModel)
 
 public:
     FriendtrackerUI(bb::cascades::Application *app, const QString& uuid);
     virtual ~FriendtrackerUI() {}
+
+    QString getPin(const QString& ppId);
 
     /*
      * unsubscribe to realtime updates and starts a timer for regular location pulling with given frequency
@@ -98,6 +101,7 @@ public:
      */
     Q_INVOKABLE void askFriendProfilePicture(const QString &);
 
+
 signals:
 	void userProfileInitialized();
 
@@ -105,6 +109,8 @@ signals:
 	 * should be connected to a slot to update friends list on websocket.js
 	 */
 	void onlinePpIdsChanged(const QStringList& ppIds);
+
+	void pinsChanged(const QStringList& pins);
 
 	/*
 	 * user's profile picture changed signal
@@ -154,6 +160,9 @@ public Q_SLOTS:
 
 	QStringList onlinePpIds();
 	void setOnlinePpIds(const QStringList& ppIds);
+
+	QStringList pins();
+	void setPins(const QStringList& pins);
 
 	/*
 	 * send pull locations request
@@ -212,6 +221,7 @@ private:
 	ServerInterface* m_serverInterface;
 	Settings* m_settings;
 	QStringList m_ppIds;
+	QStringList m_pins;
 	QStringList m_onlinePpIds;
 	QTimer* m_regularModeTimer;
 	int m_visibility;

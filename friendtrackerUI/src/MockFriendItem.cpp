@@ -26,6 +26,7 @@ MockFriendItem::MockFriendItem(QObject* parent,
 , m_statusMessage(statusMessage)
 , m_personalMessage(personalMessage)
 , m_ppId(displayName)
+, m_pin("testpin")
 {
 	QFile defaultImage("app/native/assets/images/default.jpg");
     if (!defaultImage.open(QIODevice::ReadOnly))
@@ -63,4 +64,9 @@ QString MockFriendItem::personalMessage() const
 QString MockFriendItem::ppId() const
 {
 	return m_ppId;
+}
+
+QString MockFriendItem::pin() const
+{
+	return m_pin;
 }

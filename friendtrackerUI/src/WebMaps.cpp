@@ -38,15 +38,8 @@ using namespace std;
 WebMaps::WebMaps(QObject *parent)
     : QObject(parent)
 	, m_positionInfoSource(QGeoPositionInfoSource::createDefaultSource(parent))
-	, m_ProgressDialog(new SystemProgressDialog(this))
 	, initialized(false)
 {
-	m_ProgressDialog->setState(SystemUiProgressState::Active);
-	m_ProgressDialog->setEmoticonsEnabled(true);
-	m_ProgressDialog->setTitle(tr("Initializing Friend Tracker..."));
-	m_ProgressDialog->cancelButton()->setLabel(tr("Cancel"));
-	m_ProgressDialog->confirmButton()->setLabel(QString::null);
-
 	// Start getting current location
 	if (m_positionInfoSource == 0) {
 		SystemToast toast;
@@ -74,15 +67,6 @@ void WebMaps::init()
 	Q_UNUSED(positionUpdatedConnected);
 
 	m_positionInfoSource->startUpdates();		// start get my location event loop
-
-	m_ProgressDialog->setBody("getting current location...");
-	m_ProgressDialog->setProgress(60);
-
-	SystemUiResult::Type result = m_ProgressDialog->exec();
-	if (result != SystemUiResult::ConfirmButtonSelection) {
-	    cout << "initialization error!" << endl;
-	    throw InitializationException("Initialization canceled by user");
-	}
 }
 
 QVariantList WebMaps::worldToPixelInvokable(QObject* mapObject, double lat, double lon) const
@@ -182,10 +166,6 @@ void WebMaps::updateFriendLocation(const QString& ppId, double x, double y, int 
 
 void WebMaps::positionUpdateTimeout()
 {
-	m_ProgressDialog->setBody("Initialization timeout");
-	m_ProgressDialog->setState(SystemUiProgressState::Error);
-	m_ProgressDialog->show();
-
 	if ( m_positionInfoSource->property("replyErrorCode").isValid()  ) {
 	    bb::location::PositionErrorCode::Type errorCode
 	    	= m_positionInfoSource->property("replyErrorCode").value<bb::location::PositionErrorCode::Type>();
@@ -236,15 +216,7 @@ void WebMaps::positionUpdatedHandler(const QGeoPositionInfo& update)
 	myLocation = update.coordinate();
 
 	if (!initialized) {
-		m_ProgressDialog->setBody("Initialization complete");
-		m_ProgressDialog->setProgress(100);
-		m_ProgressDialog->cancelButton()->setLabel(QString::null);
-		m_ProgressDialog->confirmButton()->setLabel(tr("Ok"));
-		m_ProgressDialog->setState(SystemUiProgressState::Inactive);
-		m_ProgressDialog->show();
-
 		emit gotMyLocation(update.coordinate());
-
 		initialized = true;
 	} else {
 		emit myLocationChanged(myLocation);
@@ -270,7 +242,7 @@ void WebMaps::showFriends()
 	request.setTarget("sys.bbm.sharehandler");
 	request.setAction("bb.action.BBMCHAT");
 	//request.setUri("pin:24E481CD");
-	request.setUri("pin:2A91A09F");
+	//request.setUri("pin:2A91A09F");
 	request.setTargetTypes(InvokeTarget::Card);
 	InvokeTargetReply* reply = invokeManager.invoke(request);
 	reply->setParent(this);

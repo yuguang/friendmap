@@ -41,7 +41,7 @@ Page {
                                 title: "Start a Chat"
                                 imageSource: "asset:///images/chat.png"
                                 query {
-                                    uri: qsTr("pin:2A91A09F")
+                                    uri: "pin:" + ListItemData.pin
                                     invokeTargetId: "sys.bbm.sharehandler"
                                     invokeActionId: "bb.action.BBMCHAT"
                                 }

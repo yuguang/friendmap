@@ -19,10 +19,11 @@ using namespace std;
 using namespace bb::platform::bbm;
 using namespace bb::cascades;
 
-FriendItem::FriendItem(QObject* parent, Contact& contact, ContactService* contactService)
+FriendItem::FriendItem(QObject* parent, Contact& contact, ContactService* contactService, const QString& pin)
 : QObject(parent)
 , m_contact(contact)
 , m_contactService(contactService)
+, m_pin(pin)
 {
 	m_displayName = m_contact.displayName();
 
@@ -80,6 +81,11 @@ QString FriendItem::personalMessage() const
 QString FriendItem::ppId() const
 {
 	return m_ppId;
+}
+
+QString FriendItem::pin() const
+{
+	return m_pin;
 }
 
 /*

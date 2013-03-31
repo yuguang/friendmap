@@ -129,6 +129,7 @@ void RegistrationHandler::registrationFinished()
     case RegistrationState::Allowed:
         m_statusMessage = tr("Application connected to BBM.  Press Continue.");
         m_temporaryError = false;
+        finishRegistration();
         break;
 
 // This error code is not yet available in the NDK.

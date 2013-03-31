@@ -48,11 +48,12 @@ public:
     Q_INVOKABLE void updateMarkers(QObject* mapObject, QObject* containerObject) const;
     Q_INVOKABLE void addPin(const QString& ppId, QObject* object);
     Q_INVOKABLE QObject* getPin(const QString& ppId) const;
+    Q_INVOKABLE void showFriends();
 
 public slots:
     void positionUpdateTimeout();
     void positionUpdatedHandler(const QGeoPositionInfo& info);
-    void showFriends();
+
     void onInvokeResult();
 
 signals:
@@ -70,7 +71,6 @@ private:
     QPoint worldToPixel(QObject* mapObject, double latitude, double longitude) const;
 
     QGeoPositionInfoSource* m_positionInfoSource;
-    bb::system::SystemProgressDialog* m_ProgressDialog;
     QGeoCoordinate myLocation;
     bool initialized;
     bb::system::InvokeTargetReply* m_invokeTargetReply;

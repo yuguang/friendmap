@@ -28,6 +28,7 @@ NavigationPane {
                 horizontalAlignment: HorizontalAlignment.Center
                 verticalAlignment: VerticalAlignment.Center
     
+    			/*
                 Label {
                     horizontalAlignment: HorizontalAlignment.Center
                     text: _registrationHandler.statusMessage
@@ -37,7 +38,8 @@ NavigationPane {
                     }
                     multiline: true
                 }
-    
+                */
+    			
                 Button {
                     horizontalAlignment: HorizontalAlignment.Center
     
@@ -48,6 +50,7 @@ NavigationPane {
                     }
                 }
                 // Display the main page if the user chooses to Continue
+                /*
                 Button {
                     horizontalAlignment: HorizontalAlignment.Center
                     visible: _registrationHandler.allowed
@@ -56,6 +59,7 @@ NavigationPane {
                         _registrationHandler.finishRegistration()
                     }
                 }
+                */
             }
         }         
     }
