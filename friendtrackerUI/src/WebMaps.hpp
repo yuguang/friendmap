@@ -42,13 +42,13 @@ public:
     void setRegularMode();
     void setRealtimeMode();
     void updateFriendLocation(const QString &, double, double, int);
+    void startChat(QObject* parent, const QString& pin);
 
     Q_INVOKABLE void setGeoLocationInterval(float value);
     Q_INVOKABLE QVariantList worldToPixelInvokable(QObject* mapObject, double lat, double lon) const;
     Q_INVOKABLE void updateMarkers(QObject* mapObject, QObject* containerObject) const;
     Q_INVOKABLE void addPin(const QString& ppId, QObject* object);
     Q_INVOKABLE QObject* getPin(const QString& ppId) const;
-    Q_INVOKABLE void showFriends();
 
 public slots:
     void positionUpdateTimeout();

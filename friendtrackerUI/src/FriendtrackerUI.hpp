@@ -101,6 +101,11 @@ public:
      */
     Q_INVOKABLE void askFriendProfilePicture(const QString &);
 
+    /*
+     * start chat window with a friend
+     */
+    Q_INVOKABLE void startChat(QObject* parent, const QString &);
+
 
 signals:
 	void userProfileInitialized();

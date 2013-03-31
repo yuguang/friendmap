@@ -233,18 +233,15 @@ double WebMaps::getMyLongitude() const
 	return myLocation.longitude();
 }
 
-void WebMaps::showFriends()
+void WebMaps::startChat(QObject* parent, const QString& pin)
 {
-	// bring up bbm chat (just forn now)
-	cout << "BBM CHAT!!!!" << endl;
-	InvokeManager invokeManager(this);
+	InvokeManager* invokeManager = new InvokeManager();
 	InvokeRequest request;
 	request.setTarget("sys.bbm.sharehandler");
 	request.setAction("bb.action.BBMCHAT");
-	//request.setUri("pin:24E481CD");
-	//request.setUri("pin:2A91A09F");
+	request.setUri(pin);
 	request.setTargetTypes(InvokeTarget::Card);
-	InvokeTargetReply* reply = invokeManager.invoke(request);
+	InvokeTargetReply* reply = invokeManager->invoke(request);
 	reply->setParent(this);
 	connect(reply, SIGNAL(finished()), this, SLOT(onInvokeResult()));
 	m_invokeTargetReply = reply;

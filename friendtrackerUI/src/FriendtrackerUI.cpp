@@ -430,6 +430,12 @@ void FriendtrackerUI::initUserProfile()
 	emit userProfileInitialized();
 }
 
+void FriendtrackerUI::startChat(QObject* parent, const QString& pin)
+{
+	cout << "START CHAT WITH: " << pin.toStdString() << endl;
+	m_webMaps->startChat(parent, pin);
+}
+
 QString FriendtrackerUI::getValueFor(const QString &objectName, const QString &defaultValue)
 {
     QSettings settings;
