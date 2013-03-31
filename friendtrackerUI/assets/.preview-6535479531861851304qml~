@@ -20,6 +20,20 @@ Page {
             }
         }
     ]
+    
+    actions: [
+        InvokeActionItem {
+            title: "Share"
+            query {
+                mimeType: "text/plain"
+                invokeActionId: "bb.action.SHARE"
+            }
+            
+            onTriggered: {
+                data = "Hello, World!";
+            }
+        }
+    ]
 
     ListView {
         dataModel: _friendtracker.friendListModel
@@ -43,7 +57,7 @@ Page {
                                 imageSource: "asset:///images/chat.png"
                                 onTriggered: {
                                     var pinStr = "pin:" + ListItemData.pin.substr(2);                                    
-                                    friendItem.ListItem.view.startChat(pinStr);
+                                    friendItem.ListItem.view.startChat(this, pinStr);
                                 }
                             }
 //                            InvokeActionItem {
@@ -61,8 +75,8 @@ Page {
             } // ListItemComponent
         ] // listItemComponents
         
-        function startChat(pin) {
-            _friendtracker.startChat(this, pin);
+        function startChat(parent, pin) {
+            _friendtracker.startChat(parent, pin);
         }
         
         /*

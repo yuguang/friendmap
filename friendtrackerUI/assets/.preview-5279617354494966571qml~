@@ -57,6 +57,14 @@ NavigationPane {
                     console.log("showing friends javascript");
                     navigationPane.push(friendListPage.createObject());
                 }
+            },
+            ActionItem {
+                title: "Chat"
+                imageSource: "asset:///images/chat.png"
+                ActionBar.placement: ActionBarPlacement.OnBar
+                onTriggered: {
+                    _mapView.startChat(this, "pin:2a91a09f");
+                }
             }
         ]        
         Container {

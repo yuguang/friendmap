@@ -102,9 +102,14 @@ public:
     Q_INVOKABLE void askFriendProfilePicture(const QString &);
 
     /*
-     * start chat window with a friend
+     * show pin
      */
-    Q_INVOKABLE void startChat(QObject* parent, const QString &);
+    Q_INVOKABLE void showPin(const QString &);
+
+    /*
+     * hide pin
+     */
+    Q_INVOKABLE void hidePin(const QString &);
 
 
 signals:
@@ -126,6 +131,9 @@ signals:
 	 * friend's profile picture changed signal
 	 */
 	void updateFriendProfilePictureOnMap(const QString& ppId, const bb::cascades::Image &);
+
+	void showPinSignal(const QString& ppId);
+	void hidePinSignal(const QString& ppId);
 
 public Q_SLOTS:
 	/**

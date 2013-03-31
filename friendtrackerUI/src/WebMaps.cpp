@@ -16,6 +16,7 @@
 #include <bb/system/InvokeTarget>
 #include <bb/system/InvokeTargetReply>
 #include <bb/system/SystemToast>
+#include <bb/system/CardDoneMessage>
 
 #include <bb/cascades/Container>
 #include <bb/cascades/maps/MapView>
@@ -26,6 +27,7 @@
 #include <sstream>
 
 #include "Exceptions.h"
+#include "Utility.h"
 
 using namespace bb::cascades;
 using namespace bb::cascades::maps;
@@ -235,16 +237,27 @@ double WebMaps::getMyLongitude() const
 
 void WebMaps::startChat(QObject* parent, const QString& pin)
 {
-	InvokeManager* invokeManager = new InvokeManager();
+	InvokeManager* invokeManager = new InvokeManager(parent);
 	InvokeRequest request;
-	request.setTarget("sys.bbm.sharehandler");
+	//request.setTarget("sys.bbm.sharehandler");
 	request.setAction("bb.action.BBMCHAT");
+	request.setMimeType("text/plain");
 	request.setUri(pin);
 	request.setTargetTypes(InvokeTarget::Card);
 	InvokeTargetReply* reply = invokeManager->invoke(request);
-	reply->setParent(this);
-	connect(reply, SIGNAL(finished()), this, SLOT(onInvokeResult()));
+	reply->setParent(parent);
+	bool result = connect(reply, SIGNAL(finished()), this, SLOT(onInvokeResult()));
+	Q_ASSERT(result);
+	result = connect(invokeManager, SIGNAL(childCardDone(const bb::system::CardDoneMessage &)),
+			this, SLOT(chatCardDone(const bb::system::CardDoneMessage &)));
+	Q_ASSERT(result);
+	invokeManager->closeChildCard();
 	m_invokeTargetReply = reply;
+}
+
+void WebMaps::chatCardDone(const bb::system::CardDoneMessage& msg)
+{
+	cout << "MSG REASON: " << msg.reason().toStdString() << endl;
 }
 
 void WebMaps::onInvokeResult()
@@ -255,12 +268,14 @@ void WebMaps::onInvokeResult()
 	        // did we use the right target ID?
 	    case InvokeReplyError::NoTarget: {
 	            cout << "invokeFinished(): Error: no target" << endl;
+	            Utility::showToast("invokeFinished(): Error: no target");
 	            break;
 	        }
 	        // There was a problem with the invoke request
 	        // did we set all the values correctly?
 	    case InvokeReplyError::BadRequest: {
 	            cout << "invokeFinished(): Error: bad request" << endl;
+	            Utility::showToast("invokeFinished(): Error: bad request");
 	            break;
 	        }
 	        // Something went completely
@@ -268,6 +283,7 @@ void WebMaps::onInvokeResult()
 	        // Find an alternate route :(
 	    case InvokeReplyError::Internal: {
 	            cout << "invokeFinished(): Error: internal" << endl;
+	            Utility::showToast("invokeFinished(): Error: internal");
 	            break;
 	        }
 	        //Message received if the invoke request is successful
