@@ -66,7 +66,11 @@ public class Application extends Controller {
         for (JsonNode friend : inputs.findPath("friends")) {
             String val = Redis.getInstance().getSync(friend.getTextValue());
             if (val != null) {
-                body.add(val);
+                // check if user is visible before returning the location
+                String[] fields = val.split(",");
+                if (fields[2].equals("1")) {
+                    body.add(val);
+                }
             }
         }
         return ok(reply);
