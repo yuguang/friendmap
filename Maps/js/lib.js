@@ -36,7 +36,7 @@ User = (function() {
 
 })();
 
-function startSubscription() {
+function startSubscription(friends) {
     console.log("start subscription");
       var host = "198.58.106.27";
       var port = 8081;
@@ -44,15 +44,15 @@ function startSubscription() {
       socket.onopen = function() {
       var i, _i, _results;
       // first get locations and then subscribe for later
-      for (i = _i = 1; _i <= 6; i = ++_i) {
+      for (i = _i = 1; _i <= friends.length; i = ++_i) {
           socket.send(JSON.stringify({
-              "GET": "testusr" + i
+              "GET": friends[i]
             }));
       }
       _results = [];
-      for (i = _i = 1; _i <= 6; i = ++_i) {
+      for (i = _i = 1; _i <= friends.length; i = ++_i) {
         _results.push(socket.send(JSON.stringify({
-          "SUBSCRIBE": "testusr" + i
+          "SUBSCRIBE": friends[i]
         })));
       }
       return _results;
@@ -65,3 +65,20 @@ function startSubscription() {
       }
     };
   };
+
+  /**
+   * populate image list for the user's friends.
+   */
+  function addFriendItem(friend) {
+    var item = null;
+
+    // Create the item's DOM in a fragment
+    item = document.createElement('div');
+    item.setAttribute('data-bb-type','item');
+    item.setAttribute('data-bb-title', friend);
+    item.setAttribute('data-bb-image', 'http://friendtracker.org/client/pics/' + friend + '.png');
+    item.innerHTML = 'nice day!';
+    item.onclick = function() {alert('clicked');};    // TODO implement locating to user
+                                                      // (needs to keep track of users locations)
+    document.getElementById('received').appendItem(item);
+  }

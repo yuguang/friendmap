@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSocket View</title>
+
+		<script src="local:///assets/lib.js"></script>
+        <script src="local:///assets/websocket.js"></script>
+        <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=en-gb"></script>
+
+        <script type="text/javascript">
+            function load(){
+                initWebSocketConnection();
+            }            
+        </script>
+    </head>
+    <body onload="load()">
+        <div id="websocket_canvas"></div>
+    </body>
+</html>

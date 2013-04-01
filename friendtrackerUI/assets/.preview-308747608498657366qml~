@@ -1,0 +1,27 @@
+import bb.cascades 1.0
+
+Sheet {
+    id: friendListSheet
+    Page {
+        onCreationCompleted: {
+            friendListSheet.open();
+        }
+        
+        Container {
+            ListView {
+                listItemComponents: [
+                    ListItemComponent {
+                        type: "listItem"
+                        
+                        StandardListItem {
+                            title: ListItemData.displayName
+                            description: ListItemData.personalMessage
+                            status: ListItemData.status
+                            
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

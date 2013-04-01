@@ -74,16 +74,25 @@
                 // Fires "after" styling is applied and "after" the screen is inserted in the DOM
                 ondomready: function(element, id) {
                     if (id === 'google') {
-                        initGoogleMaps();
+//                        initGoogleMaps();
+                        initBingMaps();
                     }
 
                     if (id === 'bing') {
                         initBingMaps();
                     }
+
+                    if (id == 'friendlist') {
+                        // reset friends list
+                        document.getElementById('received').clear();
+                        for (i=0; i<onlinefriends.length; i++) {
+                            addFriendItem(onlinefriends[i]);
+                        }
+                    }
                 }
             });
 
-            // Lock into portrait orientation
+            // Lock into portrait orientation (NOT FUNCTIONAL ON DEV ALPHA DEVICE)
             //blackberry.app.lockOrientation("portrait-primary", false);
         </script>
     </head>

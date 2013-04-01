@@ -1,0 +1,1 @@
+include (../friendtrackerUI.pro)

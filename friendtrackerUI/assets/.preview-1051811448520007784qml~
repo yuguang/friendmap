@@ -1,0 +1,9 @@
+import bb.cascades 1.0
+
+Page {
+    titleBar: TitleBar {
+        title: "FriendTracker Info"
+    }
+    Container {
+    }
+}
