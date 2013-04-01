@@ -1,0 +1,14 @@
+This is your new Play 2.1 application
+=====================================
+
+This file will be packaged with your application, when using `play dist`.
+
+Current Version: Server part: filter works, SetVisibility works(didnt test Redis, but tested by updating Database)
+SetVisibility uses the same request as locationUpdate, every time change on visibility will push the current location+visibility to 
+Redis.
+
+updatelocation() now updates both Redis and Cache.
+timeout saves from cache to db when user is kicked out of cache. But renew the timer doesnt work so far.--11:22 pm March 20
+
+Server handles timeout correctly, kick user out of cache as well as session key. 
+-- 12:50 pm March 22
