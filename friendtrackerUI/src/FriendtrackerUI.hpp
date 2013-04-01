@@ -208,6 +208,11 @@ public Q_SLOTS:
 	 */
 	bb::cascades::GroupDataModel* friendListModel();
 
+	/*
+	 * when ContactService populates contacts late, we update our ppIds asynchronously here
+	 */
+	void updatePpIds();
+
 
 private:
 	/*
@@ -228,6 +233,8 @@ private:
 		realtime,
 		regular
 	};
+
+	void initContactService();
 
 	bb::cascades::Application* m_app;
 	QString m_uuid;
@@ -250,6 +257,7 @@ private:
 	QGeoCoordinate m_coord;
 	QGeoSearchManager* m_searchManager;
 	bool m_initial;
+	QByteArray m_defaultImage;
 };
 
 #endif /* FriendtrackerUI_HPP_ */

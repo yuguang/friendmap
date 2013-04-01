@@ -107,6 +107,13 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
     		SLOT(pullLocations()));
     Q_ASSERT(connected);
 	Q_UNUSED(connected);
+
+	QFile defaultImage("app/native/assets/images/default.jpg");
+	if (!defaultImage.open(QIODevice::ReadOnly)) {
+		qDebug() << "FAILED TO OPEN DEFAULT IMAGE";
+	}
+	QByteArray imageData = defaultImage.readAll();
+	m_defaultImage = Utility::scaleImage(imageData, 140, 140);
 }
 
 /*
@@ -286,7 +293,11 @@ void FriendtrackerUI::updateFriendsLocation(const QList<User>& friends)
 
 bb::cascades::Image FriendtrackerUI::getProfilePicture()
 {
-	const QByteArray origImage = m_profile->displayPicture();
+	QByteArray origImage = m_profile->displayPicture();
+	bb::platform::bbm::ImageType::Type type = m_profile->displayPictureMimeType();
+	if (type == 0) {
+		return m_defaultImage;
+	}
 	return Utility::scaleImage(origImage, 140, 140);
 }
 
@@ -440,14 +451,24 @@ void FriendtrackerUI::initUserProfile()
 			SLOT(returnFriendDisplayPicture(const QString &,
 			const bb::platform::bbm::ImageType::Type, const QByteArray &)));
 	Q_ASSERT(connected);
+	connected = QObject::connect(m_contactService, SIGNAL(contactListUpdated()),
+			this,
+			SLOT(updatePpIds()));
+	Q_ASSERT(connected);
 	Q_UNUSED(connected);
 
+	initContactService();
+}
+
+void FriendtrackerUI::initContactService()
+{
+	// MUST NOT REMOVE THESE LINES or ContactService operations will fail!
+	cout << "registration status: " << m_regHandler->context().registrationState() << endl;
+	cout << "Contact service VALIDITY " << m_contactService->isValid() << endl;
 	QList<Contact> contacts = m_contactService->contacts();
-	QStringList ppIds;
-	for (int i = 0; i < contacts.size(); i++) {
-		ppIds.append(contacts.at(i).ppId());
+	for (QList<Contact>::iterator it = contacts.begin(); it != contacts.end(); ++it) {
+		m_ppIds.append(it->ppId());
 	}
-	m_ppIds = ppIds;
 
 	emit userProfileInitialized();
 }
@@ -489,4 +510,21 @@ bool FriendtrackerUI::getInitial() {
 void FriendtrackerUI::setInitial(bool initial) {
 	qDebug() << "initial is now " << initial;
 	m_initial = initial;
+}
+
+void FriendtrackerUI::updatePpIds()
+{
+	QList<Contact> contacts = m_contactService->contacts();
+	for (QList<Contact>::iterator it = contacts.begin(); it != contacts.end(); ++it) {
+		m_ppIds.append(it->ppId());
+	}
+
+	for (QStringList::iterator it = m_ppIds.begin(); it != m_ppIds.end(); ++it) {
+		for (QStringList::iterator it2 = m_onlinePpIds.begin(); it2 != m_onlinePpIds.end(); ++it2) {
+			if (*it != *it2) {
+				qDebug() << "Added: " << (*it);
+				m_onlinePpIds.append(*it);
+			}
+		}
+	}
 }
