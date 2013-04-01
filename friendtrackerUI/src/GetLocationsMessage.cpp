@@ -2,7 +2,7 @@
  * GetLocationMessage.cpp
  *
  *  Created on: 2013-03-25
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "GetLocationsMessage.h"

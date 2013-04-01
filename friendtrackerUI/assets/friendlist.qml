@@ -1,10 +1,10 @@
+import bb.cascades 1.0
+
 /**
  * ListView for display friends list
  * 
  * by Sukwon Oh
  */
-
-import bb.cascades 1.0
 
 Page {
     titleBar: TitleBar {
@@ -20,6 +20,17 @@ Page {
                 invokeTargetId: "sys.bbm.sharehandler"
                 invokeActionId: "bb.action.SHARE"
                 data: ""
+            }
+        },
+        InvokeActionItem {
+            id: facebookShare
+            title: "Share on facebook"
+            imageSource: "asset:///images/facebook.png"
+            query {
+                mimeType: "text/plain"
+                invokeTargetId: "Facebook"
+                invokeActionId: "bb.action.SHARE"
+                data: "@" + pinContainer.fakeBubble.bubbleText
             }
         }
     ]
@@ -43,7 +54,9 @@ Page {
                             ActionSet {
                                 title: "Show/Hide Friends"
                                 ActionItem {
-                                    title: "Show/Hide " + ListItemData.displayName
+                                    title: friendItem.ListItem.view.getTitle(ListItemData.ppId, ListItemData.displayName)
+                                    imageSource: friendItem.ListItem.view.getShowHideImage(ListItemData.ppId)
+                                    enabled: friendItem.ListItem.view.shouldEnable(ListItemData.ppId)
                                     onTriggered: {
                                         var ppId = ListItemData.ppId;
                                         friendItem.ListItem.view.showHidePin(ppId);
@@ -54,6 +67,38 @@ Page {
                     } // StandardListItem
                 } // ListItemComponent
             ] // listItemComponents
+            
+            function shouldEnable(ppId) {
+                var marker = _mapView.getPin(ppId);
+                if (marker != null) {
+                    return true
+                }
+                return false;
+            }
+            
+            function getTitle(ppId, displayName) {
+                var marker = _mapView.getPin(ppId);
+                if (marker != null) {
+                    if (marker.visible) {
+                        return "Hide " + displayName;
+                    } else {
+                        return "Show " + displayName;
+                    }
+                }
+                return "";
+            }
+            
+            function getShowHideImage(ppId) {
+                var marker = _mapView.getPin(ppId);
+                if (marker != null) {
+                    if (marker.visible) {
+                        return "asset:///images/hide.png";
+                    } else {
+                        return "asset:///images/show.png";
+                    }
+                }
+                return "asset:///images/hide.png";
+            }
 
             function showHidePin(ppId) {
                 var marker = _mapView.getPin(ppId);
@@ -64,6 +109,7 @@ Page {
                         marker.visible = true;
                     }
                 }
+                //navigationPane.pop();
             }
 
             /*

@@ -4,7 +4,7 @@
  * Manages user profiles and settings such as filtering.
  *
  *  Created on: 2013-03-23
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef SETTINGS_HPP_
@@ -50,7 +50,7 @@ public:
 
 	Q_INVOKABLE void initUserProfileFromBBM();
 	Q_INVOKABLE void openCamera();
-	Q_INVOKABLE void setStatus(int userStatus, const QString & statusMessage);
+	Q_INVOKABLE void updateStatusOnBBM();
 
 	QString displayName();
 	bb::cascades::Image profilePicture();

@@ -1,5 +1,7 @@
 /**
  * Pin container for the MapView
+ * 
+ * by Sukwon Oh, Bill Chen
  */
 import bb.cascades 1.0
 

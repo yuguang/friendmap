@@ -2,7 +2,7 @@
  * UpdateLocationMessage.cpp
  *
  *  Created on: 2013-03-16
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "UpdateLocationMessage.h"

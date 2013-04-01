@@ -2,7 +2,7 @@
  * Settings.cpp
  *
  *  Created on: 2013-03-23
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 
@@ -72,6 +72,7 @@ void Settings::setDisplayName(const QString& displayName)
 void Settings::setDisplayNameFromBBM(const QString& displayName)
 {
 	m_displayName = displayName;
+	emit displayNameChanged(displayName);	// signal to QML view
 }
 
 bb::cascades::Image Settings::profilePicture()
@@ -106,31 +107,7 @@ bbm::UserStatus::Type Settings::userStatus()
 void Settings::setUserStatus(bbm::UserStatus::Type userStatus)
 {
 	m_userStatus = userStatus;
-	bool result = m_userProfile->requestUpdateStatus(m_userStatus, m_statusMessage);
-	if (!result) {
-		cout << "STATUS UPDATE FAILED" << endl;
-	}
 	emit userStatusChanged(userStatus);
-}
-
-/*
- * Explicitly used when ...
- */
-void Settings::setStatus(int userStatus, const QString& statusMessage)
-{
-	if (userStatus == 1) {
-		m_userStatus = bbm::UserStatus::Available;
-	} else {
-		m_userStatus = bbm::UserStatus::Busy;
-	}
-	m_statusMessage = statusMessage;
-
-	bool result = m_userProfile->requestUpdateStatus(m_userStatus, "");
-	if (!result) {
-		cout << "STATUS UPDATE FAILED2" << endl;
-	}
-	emit userStatusChanged(m_userStatus);
-	emit statusMessageChanged(m_statusMessage);
 }
 
 QString Settings::statusMessage()
@@ -143,12 +120,6 @@ QString Settings::statusMessage()
  */
 void Settings::setStatusMessage(const QString& statusMessage)
 {
-	bool result = m_userProfile->requestUpdateStatus(m_userStatus, statusMessage);
-
-	if (!result) {
-		cout << "STATUS UPDATE FAILED!" << endl;
-	}
-
 	m_statusMessage = statusMessage;
 	emit statusMessageChanged(statusMessage);
 }
@@ -158,10 +129,30 @@ void Settings::setStatusMessage(const QString& statusMessage)
  */
 void Settings::setStatusFromBBM(bbm::UserStatus::Type statusType, const QString& statusMessage)
 {
-	Q_UNUSED(statusType);
 	m_userStatus = statusType;
 	m_statusMessage = statusMessage;
-	emit statusChangedFromBBM(statusType, statusMessage);
+
+	emit userStatusChanged(statusType);
+	emit statusMessageChanged(statusMessage);
+}
+
+/*
+ * Explicitly used when a user wants to update his status on BBM
+ */
+void Settings::updateStatusOnBBM()
+{
+	if ((m_userStatus == 1 && m_statusMessage == "Busy")
+			|| (m_userStatus == 2 && m_statusMessage == "Available")) {
+		Utility::execToast("You cannot be Available and Busy at the same time!");
+		return ;
+	}
+
+	bool result = m_userProfile->requestUpdateStatus(m_userStatus, m_statusMessage);
+	if (!result) {
+		Utility::execToast("Status Update Failed.");
+	} else {
+		Utility::execToast("Status Updated.");
+	}
 }
 
 QString Settings::personalMessage()
@@ -174,10 +165,14 @@ QString Settings::personalMessage()
  */
 void Settings::setPersonalMessage(const QString& personalMessage)
 {
-	m_userProfile->requestUpdatePersonalMessage(personalMessage);
-	m_personalMessage = personalMessage;
-
-	emit personalMessageChanged(personalMessage);
+	bool result = m_userProfile->requestUpdatePersonalMessage(personalMessage);
+	if (!result) {
+		Utility::execToast("Personal Message Update Failed.");
+	} else {
+		Utility::execToast("Personal Message Updated.");
+		m_personalMessage = personalMessage;
+		emit personalMessageChanged(personalMessage);
+	}
 }
 
 /*
@@ -245,25 +240,25 @@ void Settings::onCameraInvokeResult()
 	        // Invocation could not find the target
 	        // did we use the right target ID?
 	    case InvokeReplyError::NoTarget: {
-	            cout << "invokeFinished(): Error: no target" << endl;
+	            qWarning() << "invokeFinished(): Error: no target";
 	            break;
 	        }
 	        // There was a problem with the invoke request
 	        // did we set all the values correctly?
 	    case InvokeReplyError::BadRequest: {
-	            cout << "invokeFinished(): Error: bad request" << endl;
+	            qWarning() << "invokeFinished(): Error: bad request";
 	            break;
 	        }
 	        // Something went completely
 	        // wrong inside the invocation request
 	        // Find an alternate route :(
 	    case InvokeReplyError::Internal: {
-	            cout << "invokeFinished(): Error: internal" << endl;
+	            qWarning() << "invokeFinished(): Error: internal";
 	            break;
 	        }
 	        //Message received if the invoke request is successful
 	    default:
-	        cout << "invokeFinished(): Invoke Succeeded" << endl;
+	        qWarning() << "invokeFinished(): Invoke Succeeded";
 	        break;
 	    }
 
@@ -325,19 +320,15 @@ void Settings::updateProfilePicture(const QStringList& images)
 			imageType = bb::platform::bbm::ImageType::Bmp;
 		}
 
-		QByteArray scaledImageInByteArray = Utility::scaleImage(imageInByteArray, 400, 400);
+		QByteArray scaledImageInByteArray = Utility::scaleImage(imageInByteArray, 300, 300);
 
 		bool result = m_userProfile->requestUpdateDisplayPicture(imageType, scaledImageInByteArray);
 		if (!result) {
-			SystemToast toast;
-			toast.setBody("Failed to set Profile Picture!");
-			toast.exec();
+			Utility::execToast("Failed to set Profile Picture!");
 			return;
 		} else {
 			setProfilePicture(Image(scaledImageInByteArray));
-			SystemToast toast;
-			toast.setBody("Profile Picture Updated Successfully.");
-			toast.exec();
+			Utility::execToast("Profile Picture Updated Successfully.");
 		}
 	}
 }

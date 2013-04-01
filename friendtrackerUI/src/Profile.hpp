@@ -2,7 +2,7 @@
  * Profile.hpp
  *
  *  Created on: 2013-03-23
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef PROFILE_HPP_

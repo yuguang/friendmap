@@ -2,7 +2,7 @@
  * GetLocationsReply.h
  *
  *  Created on: 2013-03-25
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef GETLOCATIONSREPLY_H_

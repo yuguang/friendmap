@@ -2,7 +2,7 @@
  * GetAddressHelper.h
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef GETADDRESSHELPER_H_
@@ -20,7 +20,7 @@ class GetAddressHelper : public QObject
 	Q_OBJECT
 
 public:
-	GetAddressHelper(QObject* containerObject, double lat, double lng);
+	GetAddressHelper(QObject* containerObject, double lat, double lng, const QString& property);
 
 public Q_SLOTS:
 	void searchResults(QGeoSearchReply* reply);
@@ -28,6 +28,7 @@ public Q_SLOTS:
 
 private:
 	QObject* m_containerObject;
+	QString m_property;
 };
 
 

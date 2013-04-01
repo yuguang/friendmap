@@ -2,7 +2,7 @@
  * WebSocketView.hpp
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef WEBSOCKETVIEW_HPP_

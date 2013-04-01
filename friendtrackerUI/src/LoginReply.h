@@ -2,7 +2,7 @@
  * LoginReply.h
  *
  *  Created on: 2013-03-16
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef LOGINREPLY_H_

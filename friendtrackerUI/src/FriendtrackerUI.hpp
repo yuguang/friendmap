@@ -21,6 +21,7 @@
 #include "GetLocationsReply.h"
 
 #include <QtLocationSubset/QGeoCoordinate>
+#include <QtLocationSubset/QGeoSearchManager>
 
 // forward decl
 namespace bb {
@@ -54,12 +55,15 @@ class FriendtrackerUI : public QObject
     Q_PROPERTY(QStringList onlinePpIds READ onlinePpIds WRITE setOnlinePpIds NOTIFY onlinePpIdsChanged)
     Q_PROPERTY(QStringList pins READ pins WRITE setPins NOTIFY pinsChanged)
     Q_PROPERTY(bb::cascades::GroupDataModel* friendListModel READ friendListModel)
+    Q_PROPERTY(bool initial READ getInitial WRITE setInitial)
 
 public:
     FriendtrackerUI(bb::cascades::Application *app, const QString& uuid);
     virtual ~FriendtrackerUI() {}
 
     QString getPin(const QString& ppId);
+    bool getInitial();
+    void setInitial(bool);
 
     /*
      * unsubscribe to realtime updates and starts a timer for regular location pulling with given frequency
@@ -89,7 +93,7 @@ public:
     /*
      * asynchronously lookup the person's address and update the bubble (containerObject)
      */
-    Q_INVOKABLE void getAddress(QObject* containerObject, double x, double y);
+    Q_INVOKABLE void getAddress(QObject* containerObject, double x, double y, const QString& property);
 
     /*
      * get profile picture
@@ -134,6 +138,8 @@ signals:
 
 	void showPinSignal(const QString& ppId);
 	void hidePinSignal(const QString& ppId);
+
+	void myLocationUpdated(double lat, double lng);
 
 public Q_SLOTS:
 	/**
@@ -241,6 +247,9 @@ private:
 	int m_numProfilePictureUpdates;
 	QString m_previousProfilePicturePath;
 	Mode m_currentMode;
+	QGeoCoordinate m_coord;
+	QGeoSearchManager* m_searchManager;
+	bool m_initial;
 };
 
 #endif /* FriendtrackerUI_HPP_ */

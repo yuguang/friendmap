@@ -56,6 +56,8 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 , m_visibility(1)
 , m_numProfilePictureUpdates(0)
 , m_currentMode(realtime)
+, m_searchManager(Utility::getSearchManager())
+, m_initial(true)
 
 {
 	// get user profile when bbm registration succeeds
@@ -201,13 +203,24 @@ QString FriendtrackerUI::getPin(const QString& ppId)
 
 void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
 {
-	UpdateLocationMessage msg(m_profile->ppId(),
-			coord.latitude(),
-			coord.longitude(),
-			m_visibility,
-			m_sessionKey);
+	if (!m_coord.isValid()) {
+		m_coord = coord;
+	} else {
+		// update location when user moves more than 5m
+		if (m_coord.isValid() && coord.distanceTo(m_coord) > 5.0) {
+			UpdateLocationMessage msg(m_profile->ppId(),
+					coord.latitude(),
+					coord.longitude(),
+					m_visibility,
+					m_sessionKey);
 
-	m_serverInterface->sendMessage(msg);
+			m_serverInterface->sendMessage(msg);
+
+			m_coord = coord;
+		}
+	}
+
+	emit myLocationUpdated(coord.latitude(), coord.longitude());
 }
 
 /*
@@ -239,6 +252,15 @@ void FriendtrackerUI::setRealtimeMode()
 void FriendtrackerUI::setVisibility(bool visibility)
 {
 	m_visibility = (visibility ? 1 : 0);
+
+	// use update location request to immediately update visibility
+	UpdateLocationMessage msg(m_profile->ppId(),
+			m_webMaps->getMyLatitude(),
+			m_webMaps->getMyLongitude(),
+			m_visibility,
+			m_sessionKey);
+
+	m_serverInterface->sendMessage(msg);
 }
 
 /*
@@ -278,7 +300,7 @@ void FriendtrackerUI::askFriendProfilePicture(const QString& ppId)
 		if (contacts.at(i).ppId() == ppId) {
 			bool result = m_contactService->requestDisplayPicture(contacts.at(i).handle());
 			if (!result) {
-				cout << "FAILED TO GET FRIEND's PROFILE PICTURE" << endl;
+				qWarning() << "FAILED TO GET FRIEND's PROFILE PICTURE";
 			}
 			break;
 		}
@@ -336,13 +358,13 @@ void FriendtrackerUI::saveUserProfilePicture(const QByteArray& imageData)
 {
 	QImage imageToWrite;
 	if (!imageToWrite.loadFromData(imageData)) {
-		cout << "failed to load profile picture for saving!" << endl;
+		qWarning() << "failed to load profile picture for saving!";
 	} else {
 		imageToWrite = imageToWrite.scaled(140, 140, Qt::KeepAspectRatio);	// profile picture is 80x80
 		stringstream ss;
 		ss << "app/native/assets/profile.jpg";
 		if (!imageToWrite.save(ss.str().c_str(), "JPG")) {
-			cout << "failed to save profile picture!" << endl;
+			qWarning() << "failed to save profile picture!";
 		}
 	}
 }
@@ -356,7 +378,7 @@ GroupDataModel* FriendtrackerUI::friendListModel()
 
 	QList<Contact> contacts = m_contactService->contacts();
 	for (QList<Contact>::iterator it = contacts.begin(); it != contacts.end(); ++it) {
-		cout << "POPULATE: " << it->displayName().toStdString() << endl;
+		qDebug() << "POPULATE: " << it->displayName();
 		groupDataModel->insert(new FriendItem(this, *it, m_contactService, getPin(it->ppId())));
 	}
 
@@ -365,14 +387,14 @@ GroupDataModel* FriendtrackerUI::friendListModel()
 	groupDataModel->insert(new MockFriendItem(this, "testusr2", UserStatus::Available, "Available", "cool weather!"));
 	groupDataModel->insert(new MockFriendItem(this, "testusr3", UserStatus::Available, "Available", "I'm hungry!"));
 
-	cout << "POPULATED" << endl;
+	qDebug() << "POPULATED";
 
 	return groupDataModel;
 }
 
 void FriendtrackerUI::loadMap()
 {
-	cout << "loadMap started" << endl;
+	qDebug() << "loadMap started";
 
 	// save user's profile before loading the map
 	saveUserProfilePicture();
@@ -394,10 +416,10 @@ void FriendtrackerUI::loadMap()
     m_app->setScene(root);
 }
 
-void FriendtrackerUI::getAddress(QObject* containerObject, double lat, double lng)
+void FriendtrackerUI::getAddress(QObject* containerObject, double lat, double lng, const QString& property)
 {
 	// FIXME: I know this is a leak
-	GetAddressHelper* helper = new GetAddressHelper(containerObject, lat, lng);
+	GetAddressHelper* helper = new GetAddressHelper(containerObject, lat, lng, property);
 	Q_UNUSED(helper);
 }
 
@@ -458,4 +480,13 @@ void FriendtrackerUI::saveValueFor(const QString &objectName, const QString &inp
     // A new value is saved to the application settings object.
     QSettings settings;
     settings.setValue(objectName, QVariant(inputValue));
+}
+
+bool FriendtrackerUI::getInitial() {
+	return m_initial;
+}
+
+void FriendtrackerUI::setInitial(bool initial) {
+	qDebug() << "initial is now " << initial;
+	m_initial = initial;
 }

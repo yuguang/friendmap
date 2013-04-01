@@ -2,7 +2,7 @@
  * MockFriendItem.cpp
  *
  *  Created on: 2013-03-30
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "MockFriendItem.hpp"

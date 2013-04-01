@@ -2,7 +2,7 @@
  * GetAddressHelper.cpp
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 
@@ -20,10 +20,12 @@ using namespace std;
 using namespace QtMobilitySubset;
 using namespace bb::cascades;
 
-GetAddressHelper::GetAddressHelper(QObject* containerObject, double lat, double lng)
+GetAddressHelper::GetAddressHelper(QObject* containerObject, double lat, double lng, const QString& property)
 : m_containerObject(containerObject)
+, m_property(property)
 {
 	QGeoSearchManager* searchManager = Utility::getSearchManager();
+	searchManager->setProperty("boundary", "address");
 	QGeoSearchReply* reply = searchManager->reverseGeocode(QGeoCoordinate(lat, lng));
 	if (reply->isFinished()) {
 		if (reply->error() == QGeoSearchReply::NoError) {
@@ -51,7 +53,7 @@ void GetAddressHelper::searchResults(QGeoSearchReply* reply)
 {
 	QList<QGeoPlace> places = reply->places();
 	Container* container = qobject_cast<Container*>(m_containerObject);
-	container->setProperty("bubbleText", places.at(0).address().text());
+	container->setProperty(m_property.toStdString().c_str(), places.at(0).address().text());
 
 	// disconnect all signals to the search manager
 	Utility::getSearchManager()->disconnect();
@@ -61,7 +63,7 @@ void GetAddressHelper::searchResults(QGeoSearchReply* reply)
 void GetAddressHelper::searchError(QGeoSearchReply* reply, QGeoSearchReply::Error error,
 		const QString& errorMessage)
 {
-	cout << "SEARCH ERROR: " << errorMessage.toStdString() << endl;
+	qWarning() << "SEARCH ERROR: " << errorMessage;
 	// disconnect all signals to the search manager
 	Utility::getSearchManager()->disconnect();
 	reply->deleteLater();

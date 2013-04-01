@@ -2,7 +2,7 @@
  * UpdateLocationReply.h
  *
  *  Created on: 2013-03-16
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef UPDATELOCATIONREPLY_H_

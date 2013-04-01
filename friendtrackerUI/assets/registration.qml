@@ -1,5 +1,7 @@
 /**
  * BBM registration page
+ * 
+ * by Sukwon Oh, Bill Chen
  */
 import bb.cascades 1.0
 

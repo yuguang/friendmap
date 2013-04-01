@@ -2,7 +2,7 @@
  * MockFriendItem.hpp
  *
  *  Created on: 2013-03-30
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef MOCKFRIENDITEM_HPP_

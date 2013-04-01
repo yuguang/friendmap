@@ -2,7 +2,7 @@
  * Exceptions.h
  *
  *  Created on: 2013-03-28
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef EXCEPTIONS_H_

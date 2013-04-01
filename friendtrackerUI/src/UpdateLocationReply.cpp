@@ -2,7 +2,7 @@
  * UpdateLocationReply.cpp
  *
  *  Created on: 2013-03-16
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "UpdateLocationReply.h"
@@ -18,9 +18,9 @@ bool UpdateLocationReply::parse(const QByteArray& data)
 	JsonDataAccess jsonObject;
 	QVariant node = jsonObject.loadFromBuffer(data);
 	if (jsonObject.hasError()) {
-		cout << "error converting JSON data: " << jsonObject.error().errorMessage().toStdString() << endl;
+		qWarning() << "error converting JSON data: " << jsonObject.error().errorMessage();
 	} else {
-		cout << "before parse: " << QString(data).toStdString() << endl;
+		qDebug() << "before parse: " << QString(data);
 		QVariantMap map = node.value<QVariantMap>();
 		if (map["status"].toString() == "OK") {
 			return true;

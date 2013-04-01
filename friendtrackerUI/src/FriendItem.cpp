@@ -2,7 +2,7 @@
  * FriendList.cpp
  *
  *  Created on: 2013-03-30
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "FriendItem.hpp"
@@ -39,7 +39,7 @@ FriendItem::FriendItem(QObject* parent, Contact& contact, ContactService* contac
 	// asynchronously populate displayPicture
 	bool result = m_contactService->requestDisplayPicture(contact.handle());
 	if (!result) {
-		cout << "FAILED TO GET FRIEND's PROFILE PICTURE" << endl;
+		qWarning() << "FAILED TO GET FRIEND's PROFILE PICTURE";
 	}
 
 	m_userStatus = m_contact.status();
@@ -58,7 +58,7 @@ Image FriendItem::profilePicture() const
 	// asynchronously populate displayPicture
 	bool result = m_contactService->requestDisplayPicture(m_contact.handle());
 	if (!result) {
-		cout << "FAILED TO GET FRIEND's PROFILE PICTURE" << endl;
+		qWarning() << "FAILED TO GET FRIEND's PROFILE PICTURE";
 	}
 	return m_profilePicture;
 }

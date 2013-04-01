@@ -97,27 +97,19 @@
     <asset path="translations" dest="qm">
         <include name="*.qm"/>
     </asset>
-    <asset path="C:/Users/soh/Downloads/global-search-icon.png">global-search-icon.png</asset>
-    <asset path="C:/Users/soh/Downloads/googlemaps.png">googlemaps.png</asset>
+    <asset path="assets/images/googlemaps.png">googlemaps.png</asset>
     
     <!-- Request permission to execute native code.  Required for native applications. -->
     <permission system="true">run_native</permission>
     <permission>bbm_connect</permission>
     <permission>read_geolocation</permission>
     <permission>access_location_services</permission>
-    <permission>access_pimdomain_calendars</permission>
     <permission>use_camera</permission>
-    <permission>access_pimdomain_contacts</permission>
     <permission>read_device_identifying_information</permission>
     <permission>access_pimdomain_messages</permission>
     <permission>access_internet</permission>
-    <permission>record_audio</permission>
-    <permission>access_pimdomain_notebooks</permission>
-    <permission>post_notification</permission>
-    <permission system="true">_sys_use_consumer_push</permission>
-    <permission>run_when_backgrounded</permission>
     <permission>access_shared</permission>
-    <permission>access_sms_mms</permission>
+    <permission>run_when_backgrounded</permission>
     <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
 
 </qnx>

@@ -2,7 +2,7 @@
  * Utility.cpp
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "Utility.h"
@@ -44,4 +44,11 @@ void Utility::showToast(const QString& msg)
 	SystemToast toast;
 	toast.setBody(msg);
 	toast.show();
+}
+
+void Utility::execToast(const QString& msg)
+{
+	SystemToast toast;
+	toast.setBody(msg);
+	toast.exec();
 }

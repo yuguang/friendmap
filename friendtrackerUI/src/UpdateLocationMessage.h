@@ -2,7 +2,7 @@
  * UpdateLocationMessage.h
  *
  *  Created on: 2013-03-16
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef UPDATELOCATIONMESSAGE_H_

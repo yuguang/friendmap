@@ -5,6 +5,7 @@
  * Written By: Sukwon Oh, Bill Chen
  */
 #include "WebMaps.hpp"
+#include "FriendtrackerUI.hpp"
 
 #include <QDebug>
 #include <QFile>
@@ -49,6 +50,10 @@ WebMaps::WebMaps(QObject *parent)
 		toast.exec();
 		throw InitializationException("Failed to get current location");
 	}
+
+	// applied previously saved update frequency settings
+	FriendtrackerUI* friendtracker = (FriendtrackerUI *) parent;
+	m_positionInfoSource->setUpdateInterval((int)friendtracker->getValueFor("updateFrequencySlider", "5").toDouble() * 1000);
 	m_positionInfoSource->setProperty("accuracy", 2.0);	// set accuracy within 2m
 }
 
@@ -141,7 +146,7 @@ void WebMaps::setGeoLocationInterval(float value)
 void WebMaps::setRegularMode()
 {
 	// unsubscribe all friends
-	cout << "unsubscribing..." << endl;
+	qDebug() << "unsubscribing...";
 	emit unsubscribe();
 }
 
@@ -152,7 +157,7 @@ void WebMaps::setRegularMode()
 void WebMaps::setRealtimeMode()
 {
 	// subscribe to all friends
-	cout << "subscribing..." << endl;
+	qDebug() << "subscribing...";
 	emit subscribe();
 }
 
@@ -171,27 +176,27 @@ void WebMaps::positionUpdateTimeout()
 	if ( m_positionInfoSource->property("replyErrorCode").isValid()  ) {
 	    bb::location::PositionErrorCode::Type errorCode
 	    	= m_positionInfoSource->property("replyErrorCode").value<bb::location::PositionErrorCode::Type>();
-	    cout << "LM Error Code: ";
+	    qDebug() << "LM Error Code: ";
 	    switch ( errorCode ) {
 	        // this error code should not be encountered here (included for completeness)
 	        case bb::location::PositionErrorCode::None:
-	            cout << "None" << endl;
+	            qDebug() << "None";
 	            break;
 
 	        case bb::location::PositionErrorCode::FatalDisabled:
-	            cout << "Fatal - disabled (turn on location services!)" << endl;
+	            qDebug() << "Fatal - disabled (turn on location services!)";
 	            break;
 
 	        // this error code should not normally be encountered, may require setting
 	        // the reset property to resolve.
 	        case bb::location::PositionErrorCode::FatalInsufficientProviders:
-	            cout << "Fatal - insufficient providers" << endl;
+	            qDebug() << "Fatal - insufficient providers";
 	            break;
 
 	        // this error code could be encountered if an invalid value is set for a
 	        // property related to a BB10 Location Manager feature.
 	        case bb::location::PositionErrorCode::FatalInvalidRequest:
-	            cout << "Fatal - invalid request" << endl;
+	            qDebug() << "Fatal - invalid request";
 	            break;
 
 	        // the following warning codes are simply to provide more information;
@@ -199,15 +204,15 @@ void WebMaps::positionUpdateTimeout()
 	        // It may be opportune to inform the user that finding the location is
 	        // taking longer than expected.
 	        case bb::location::PositionErrorCode::WarnTimeout:
-	            cout << "Warning - timeout" << endl;
+	            qDebug() << "Warning - timeout";
 	            break;
 
 	        case bb::location::PositionErrorCode::WarnLostTracking:
-	            cout << "Warning - lost tracking" << endl;
+	            qDebug() << "Warning - lost tracking";
 	            break;
 
 	        default:
-	            cout << "Unknown (bad enum value)" << endl;
+	            qWarning() << "Unknown (bad enum value)";
 	            break;
 	    }
 	}
@@ -257,7 +262,7 @@ void WebMaps::startChat(QObject* parent, const QString& pin)
 
 void WebMaps::chatCardDone(const bb::system::CardDoneMessage& msg)
 {
-	cout << "MSG REASON: " << msg.reason().toStdString() << endl;
+	qDebug() << "MSG REASON: " << msg.reason();
 }
 
 void WebMaps::onInvokeResult()
@@ -267,14 +272,14 @@ void WebMaps::onInvokeResult()
 	        // Invocation could not find the target
 	        // did we use the right target ID?
 	    case InvokeReplyError::NoTarget: {
-	            cout << "invokeFinished(): Error: no target" << endl;
+	            qWarning() << "invokeFinished(): Error: no target";
 	            Utility::showToast("invokeFinished(): Error: no target");
 	            break;
 	        }
 	        // There was a problem with the invoke request
 	        // did we set all the values correctly?
 	    case InvokeReplyError::BadRequest: {
-	            cout << "invokeFinished(): Error: bad request" << endl;
+	            qWarning() << "invokeFinished(): Error: bad request";
 	            Utility::showToast("invokeFinished(): Error: bad request");
 	            break;
 	        }
@@ -282,13 +287,13 @@ void WebMaps::onInvokeResult()
 	        // wrong inside the invocation request
 	        // Find an alternate route :(
 	    case InvokeReplyError::Internal: {
-	            cout << "invokeFinished(): Error: internal" << endl;
+	            qWarning() << "invokeFinished(): Error: internal";
 	            Utility::showToast("invokeFinished(): Error: internal");
 	            break;
 	        }
 	        //Message received if the invoke request is successful
 	    default:
-	        cout << "invokeFinished(): Invoke Succeeded" << endl;
+	        qWarning() << "invokeFinished(): Invoke Succeeded";
 	        break;
 	    }
 

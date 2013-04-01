@@ -62,7 +62,7 @@
 <context>
     <name>registration</name>
     <message>
-        <location filename="../assets/registration.qml" line="47"/>
+        <location filename="../assets/registration.qml" line="49"/>
         <source>Connect to BBM</source>
         <translation type="unfinished"></translation>
     </message>
@@ -75,7 +75,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/settings.qml" line="327"/>
+        <location filename="../assets/settings.qml" line="296"/>
         <source>Server Settings</source>
         <translation type="unfinished"></translation>
     </message>

@@ -2,7 +2,7 @@
  * Utility.h
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef UTILITY_H_
@@ -21,6 +21,7 @@ public:
 	static QByteArray scaleImage(const QByteArray& imageDdata, int width, int height);
 	static QtMobilitySubset::QGeoSearchManager* getSearchManager();
 	static void showToast(const QString &);
+	static void execToast(const QString &);
 };
 
 

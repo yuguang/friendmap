@@ -2,7 +2,7 @@
  * WebSocketView.cpp
  *
  *  Created on: 2013-03-29
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #include "WebSocketView.hpp"

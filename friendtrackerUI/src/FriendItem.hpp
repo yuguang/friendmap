@@ -2,7 +2,7 @@
  * FriendItem.hpp
  *
  *  Created on: 2013-03-30
- *      Author: soh
+ *      Author: Sukwon Oh
  */
 
 #ifndef FRIENDITEM_HPP_

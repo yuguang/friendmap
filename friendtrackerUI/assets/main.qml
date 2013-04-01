@@ -1,11 +1,12 @@
+import bb.cascades 1.0
+import bb.system 1.0
+import bb.cascades.maps 1.0
+
 /*
  * Main Window for the Friendtracker App
  * 
  * by Sukwon Oh
  */
-import bb.cascades 1.0
-import bb.system 1.0
-import bb.cascades.maps 1.0
 
 NavigationPane {
     id: navigationPane    
@@ -133,6 +134,8 @@ NavigationPane {
                 property variant currentBubble: null
                 property variant me
                 property variant locations: {}
+                property string address
+                property variant fakeBubble: null
                 layout: AbsoluteLayout {
                 }
                 
@@ -143,22 +146,25 @@ NavigationPane {
                 onCreationCompleted: {
                     _friendtracker.updateProfilePictureOnMap.connect(pinContainer.updateProfilePicture);
                     _friendtracker.updateFriendProfilePictureOnMap.connect(pinContainer.updateFriendProfilePicture);
-                    _friendtracker.showPin.connect(pinContainer.showPin);
-                    _friendtracker.hidePin.connect(pinContainer.hidePin);
+//                    _friendtracker.showPin.connect(pinContainer.showPin);
+//                    _friendtracker.hidePin.connect(pinContainer.hidePin);
+                    _friendtracker.myLocationUpdated.connect(pinContainer.updateMyLocation);
+                    fakeBubble = bubble.createObject();
+                    _friendtracker.getAddress(fakeBubble, _mapView.myLat, _mapView.myLon, "bubbleText");
                 }
                 
                 /*
-                 * show pin
+                 * 
                  */
-                function showPin(ppId) {
-                    var marker = _mapView.getPin(ppId);
-                    if (marker != null) {
-                        
+                function updateMyLocation(lat, lng) {
+                    if (me != null) {
+                        me.lat = lat;
+                        me.lon = lng;
+                        var xy = _mapView.worldToPixelInvokable(mapview, me.lat, me.lon);
+                        _friendtracker.getAddress(fakeBubble, _mapView.myLat, _mapView.myLon, "bubbleText");
+                        me.x = xy[0];
+                        me.y = xy[1];                        
                     }
-                }
-                
-                function hidePin(ppId) {
-                    
                 }
                 
                 /*
@@ -218,7 +224,7 @@ NavigationPane {
                     details.x = xy[0];
                     details.y = xy[1];
                     // asynchronously get the person's address given location and write it on bubble
-                    _friendtracker.getAddress(details, pin.lat, pin.lon);
+                    _friendtracker.getAddress(details, pin.lat, pin.lon, "bubbleText");
                     pinContainer.add(details);
                     details.play();
                     currentBubble = details;
