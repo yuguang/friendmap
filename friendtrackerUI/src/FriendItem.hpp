@@ -18,11 +18,11 @@ class FriendItem : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString displayName READ displayName FINAL)
-	Q_PROPERTY(bb::cascades::Image profilePicture READ profilePicture)
-	Q_PROPERTY(bb::platform::bbm::UserStatus::Type userStatus READ userStatus FINAL)
-	Q_PROPERTY(QString statusMessage READ statusMessage FINAL)
-	Q_PROPERTY(QString personalMessage READ personalMessage FINAL)
+	Q_PROPERTY(QString displayName READ displayName NOTIFY displayNameChanged)
+	Q_PROPERTY(bb::cascades::Image profilePicture READ profilePicture NOTIFY profilePictureChanged)
+	Q_PROPERTY(bb::platform::bbm::UserStatus::Type userStatus READ userStatus NOTIFY userStatusChanged)
+	Q_PROPERTY(QString statusMessage READ statusMessage NOTIFY statusMessageChanged)
+	Q_PROPERTY(QString personalMessage READ personalMessage NOTIFY personalMessageChanged)
 	Q_PROPERTY(QString ppId READ ppId FINAL)
 	Q_PROPERTY(QString pin READ pin FINAL)
 
@@ -41,6 +41,14 @@ public:
 
 public Q_SLOTS:
 	void updateFriendDisplayPicture(const QString &, const bb::platform::bbm::ImageType::Type, const QByteArray &);
+
+signals:
+	void displayNameChanged(const QString &);
+	void profilePictureChanged(const bb::cascades::Image &);
+	void userStatusChanged(bb::platform::bbm::UserStatus::Type);
+	void statusMessageChanged(const QString &);
+	void personalMessageChanged(const QString &);
+
 
 private:
 	bb::platform::bbm::Contact m_contact;

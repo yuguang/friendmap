@@ -213,6 +213,23 @@ public Q_SLOTS:
 	 */
 	void updatePpIds();
 
+	/*
+	 * Restores to user set server settings when the app is brought back to foreground
+	 */
+	void changeToFullScreenMode();
+
+	/*
+	 * Saves battery and data by unsubscribing from realtime mode and stop getting locations of friends.
+	 * Also, increase timeout for pushing location to server to every 5 min.
+	 */
+	void changeToThumbnailMode();
+
+	/*
+	 * Saves battery and data by unsubscribing from realtime mode and stop getting locations of friends.
+	 * Also, increase timeout for pushing location to server to every 5 min.
+	 */
+	void changeToInvisible();
+
 
 private:
 	/*
@@ -232,6 +249,12 @@ private:
 	enum Mode {
 		realtime,
 		regular
+	};
+
+	enum State {
+		fullScreen,
+		thumbNail,
+		invisible
 	};
 
 	void initContactService();
@@ -258,6 +281,7 @@ private:
 	QGeoSearchManager* m_searchManager;
 	bool m_initial;
 	QByteArray m_defaultImage;
+	State m_state;
 };
 
 #endif /* FriendtrackerUI_HPP_ */

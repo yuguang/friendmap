@@ -58,6 +58,7 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 , m_currentMode(realtime)
 , m_searchManager(Utility::getSearchManager())
 , m_initial(true)
+, m_state(fullScreen)
 
 {
 	// get user profile when bbm registration succeeds
@@ -106,6 +107,15 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
     		this,
     		SLOT(pullLocations()));
     Q_ASSERT(connected);
+
+    connected = connect(m_app, SIGNAL(fullscreen()), this, SLOT(changeToFullScreenMode()));
+    Q_ASSERT(connected);
+
+    connected = connect(m_app, SIGNAL(thumbnail()), this, SLOT(changeToThumbnailMode()));
+    Q_ASSERT(connected);
+
+    connected = connect(m_app, SIGNAL(invisible()), this, SLOT(changeToInvisible()));
+    Q_ASSERT(connected);
 	Q_UNUSED(connected);
 
 	QFile defaultImage("app/native/assets/images/default.jpg");
@@ -114,6 +124,60 @@ FriendtrackerUI::FriendtrackerUI(bb::cascades::Application *app, const QString& 
 	}
 	QByteArray imageData = defaultImage.readAll();
 	m_defaultImage = Utility::scaleImage(imageData, 140, 140);
+}
+
+void FriendtrackerUI::changeToFullScreenMode()
+{
+	if (m_webMaps != 0) {
+		if (m_state == thumbNail || m_state == invisible) {
+			// restore mode
+			if (m_currentMode == realtime) {
+				setRealtimeMode();
+			} else {
+				setRegularMode(getValueFor("pullFrequencySlider", "5").toDouble());
+			}
+
+			// restore location update frequency
+			m_webMaps->setGeoLocationInterval(getValueFor("updateFrequencySlider", "5").toDouble());
+		}
+		qDebug() << "FULL SCREEN";
+
+		m_state = fullScreen;
+	}
+}
+
+void FriendtrackerUI::changeToThumbnailMode()
+{
+	if (m_webMaps != 0) {
+		if (m_state == fullScreen) {
+			// stop getting friends locations
+			m_regularModeTimer->stop();			// stop timer for getting friends locations
+			m_webMaps->setRegularMode();		// unsubscribe to realtime stream
+
+			// increase timeout value for pushing location to server to every 5 min
+			m_webMaps->setGeoLocationInterval(300);
+		}
+		qDebug() << "THUMBNAIL";
+
+		m_state = thumbNail;
+	}
+}
+
+void FriendtrackerUI::changeToInvisible()
+{
+	if (m_webMaps != 0) {
+		if (m_state == fullScreen) {
+			// stop getting friends locations
+			m_regularModeTimer->stop();			// stop timer for getting friends locations
+			m_webMaps->setRegularMode();		// unsubscribe to realtime stream
+
+			// increase timeout value for pushing location to server to every 5 min
+			m_webMaps->setGeoLocationInterval(300);
+		}
+		qDebug() << "INVISIBLE";
+
+		m_state = invisible;
+	}
 }
 
 /*
@@ -214,7 +278,7 @@ void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
 		m_coord = coord;
 	} else {
 		// update location when user moves more than 5m
-		if (m_coord.isValid() && coord.distanceTo(m_coord) > 5.0) {
+		if (m_coord.isValid() /*&& coord.distanceTo(m_coord) > 5.0*/) {
 			UpdateLocationMessage msg(m_profile->ppId(),
 					coord.latitude(),
 					coord.longitude(),
@@ -394,9 +458,9 @@ GroupDataModel* FriendtrackerUI::friendListModel()
 	}
 
 	// Only for testing scenario
-	groupDataModel->insert(new MockFriendItem(this, "testusr1", UserStatus::Available, "Available", "I am testusr1!"));
-	groupDataModel->insert(new MockFriendItem(this, "testusr2", UserStatus::Available, "Available", "cool weather!"));
-	groupDataModel->insert(new MockFriendItem(this, "testusr3", UserStatus::Available, "Available", "I'm hungry!"));
+//	groupDataModel->insert(new MockFriendItem(this, "testusr1", UserStatus::Available, "Available", "I am testusr1!"));
+//	groupDataModel->insert(new MockFriendItem(this, "testusr2", UserStatus::Available, "Available", "cool weather!"));
+//	groupDataModel->insert(new MockFriendItem(this, "testusr3", UserStatus::Available, "Available", "I'm hungry!"));
 
 	qDebug() << "POPULATED";
 

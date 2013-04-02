@@ -45,7 +45,7 @@ public:
     void updateFriendLocation(const QString &, double, double, int);
     Q_INVOKABLE void startChat(QObject* parent, const QString& pin);
 
-    Q_INVOKABLE void setGeoLocationInterval(float value);
+    Q_INVOKABLE void setGeoLocationInterval(float value, bool showToast = true);
     Q_INVOKABLE QVariantList worldToPixelInvokable(QObject* mapObject, double lat, double lon) const;
     Q_INVOKABLE void updateMarkers(QObject* mapObject, QObject* containerObject) const;
     Q_INVOKABLE void addPin(const QString& ppId, QObject* object);

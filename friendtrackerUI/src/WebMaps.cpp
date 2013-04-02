@@ -54,7 +54,10 @@ WebMaps::WebMaps(QObject *parent)
 	// applied previously saved update frequency settings
 	FriendtrackerUI* friendtracker = (FriendtrackerUI *) parent;
 	m_positionInfoSource->setUpdateInterval((int)friendtracker->getValueFor("updateFrequencySlider", "5").toDouble() * 1000);
-	m_positionInfoSource->setProperty("accuracy", 2.0);	// set accuracy within 2m
+	//m_positionInfoSource->setProperty("accuracy", 2.0);	// set accuracy within 2m
+	m_positionInfoSource->setProperty( "canRunInBackground", true );
+	m_positionInfoSource->setProperty( "provider", "hybrid" );
+	m_positionInfoSource->setProperty( "fixType", "best" );
 }
 
 void WebMaps::init()
@@ -126,15 +129,15 @@ QPoint WebMaps::worldToPixel(QObject* mapObject, double latitude, double longitu
 /*
  * Update GeoLocation update interval to the user specified value
  */
-void WebMaps::setGeoLocationInterval(float value)
+void WebMaps::setGeoLocationInterval(float value, bool showToast)
 {
 	if (m_positionInfoSource) {
-		SystemToast toast;
-		stringstream ss;
-		ss << "Location Update Interval changed to "
-				<< (int)value << " seconds";
-		toast.setBody(ss.str().c_str());
-		toast.exec();
+		if (showToast) {
+			stringstream ss;
+			ss << "Location Update Interval changed to "
+					<< (int)value << " seconds";
+			Utility::execToast(ss.str().c_str());
+		}
 		m_positionInfoSource->setUpdateInterval((int)value * 1000);
 	}
 }
@@ -181,22 +184,26 @@ void WebMaps::positionUpdateTimeout()
 	        // this error code should not be encountered here (included for completeness)
 	        case bb::location::PositionErrorCode::None:
 	            qDebug() << "None";
+	            Utility::execToast("Geolocation Error: None");
 	            break;
 
 	        case bb::location::PositionErrorCode::FatalDisabled:
 	            qDebug() << "Fatal - disabled (turn on location services!)";
+	            Utility::execToast("Geolocation Error: Fatal - disabled (turn on location services!");
 	            break;
 
 	        // this error code should not normally be encountered, may require setting
 	        // the reset property to resolve.
 	        case bb::location::PositionErrorCode::FatalInsufficientProviders:
 	            qDebug() << "Fatal - insufficient providers";
+	            Utility::execToast("Geolocation Error: Fatal - insufficient providers");
 	            break;
 
 	        // this error code could be encountered if an invalid value is set for a
 	        // property related to a BB10 Location Manager feature.
 	        case bb::location::PositionErrorCode::FatalInvalidRequest:
 	            qDebug() << "Fatal - invalid request";
+	            Utility::execToast("Geolocation Error: Fatal - invalid request");
 	            break;
 
 	        // the following warning codes are simply to provide more information;
@@ -205,10 +212,12 @@ void WebMaps::positionUpdateTimeout()
 	        // taking longer than expected.
 	        case bb::location::PositionErrorCode::WarnTimeout:
 	            qDebug() << "Warning - timeout";
+	            Utility::execToast("Geolocation Error: Warning - timeout");
 	            break;
 
 	        case bb::location::PositionErrorCode::WarnLostTracking:
 	            qDebug() << "Warning - lost tracking";
+	            Utility::execToast("Geolocation Error: Warning - lost tracking");
 	            break;
 
 	        default:
