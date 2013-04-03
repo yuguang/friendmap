@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FriendItem.hpp'
 **
-** Created: Tue Apr 2 12:46:13 2013
+** Created: Tue Apr 2 20:35:30 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,8 +23,8 @@ static const uint qt_meta_data_FriendItem[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
-       7,   44, // properties
+       7,   14, // methods
+       7,   49, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -39,15 +39,16 @@ static const uint qt_meta_data_FriendItem[] = {
 
  // slots: signature, parameters, type, tag, flags
      203,  200,   11,   11, 0x0a,
+     299,  285,   11,   11, 0x0a,
 
  // properties: name, type, flags
-     293,  285, 0x0a495001,
-     325,  305, 0x00495009,
-     376,  340, 0x00495009,
-     387,  285, 0x0a495001,
-     401,  285, 0x0a495001,
-     417,  285, 0x0a095801,
-     422,  285, 0x0a095801,
+     330,  322, 0x0a495001,
+     362,  342, 0x00495009,
+     413,  377, 0x00495009,
+     424,  322, 0x0a495001,
+     438,  322, 0x0a495001,
+     454,  322, 0x0a095801,
+     459,  322, 0x0a095801,
 
  // properties: notify_signal_id
        0,
@@ -69,6 +70,7 @@ static const char qt_meta_stringdata_FriendItem[] = {
     "personalMessageChanged(QString)\0,,\0"
     "updateFriendDisplayPicture(QString,bb::platform::bbm::ImageType::Type,"
     "QByteArray)\0"
+    "contactHandle\0updateContact(QString)\0"
     "QString\0displayName\0bb::cascades::Image\0"
     "profilePicture\0bb::platform::bbm::UserStatus::Type\0"
     "userStatus\0statusMessage\0personalMessage\0"
@@ -87,6 +89,7 @@ void FriendItem::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->statusMessageChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 4: _t->personalMessageChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 5: _t->updateFriendDisplayPicture((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const bb::platform::bbm::ImageType::Type(*)>(_a[2])),(*reinterpret_cast< const QByteArray(*)>(_a[3]))); break;
+        case 6: _t->updateContact((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -134,9 +137,9 @@ int FriendItem::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 7;
     }
 #ifndef QT_NO_PROPERTIES
       else if (_c == QMetaObject::ReadProperty) {

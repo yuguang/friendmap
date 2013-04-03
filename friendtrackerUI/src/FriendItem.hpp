@@ -41,6 +41,7 @@ public:
 
 public Q_SLOTS:
 	void updateFriendDisplayPicture(const QString &, const bb::platform::bbm::ImageType::Type, const QByteArray &);
+	void updateContact(const QString& contactHandle);
 
 signals:
 	void displayNameChanged(const QString &);
@@ -61,6 +62,7 @@ private:
 	QString m_personalMessage;
 	QString m_ppId;
 	QString m_pin;
+	QString m_handle;
 };
 
 

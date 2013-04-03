@@ -34,6 +34,12 @@ FriendItem::FriendItem(QObject* parent, Contact& contact, ContactService* contac
 			SLOT(updateFriendDisplayPicture(const QString &,
 			const bb::platform::bbm::ImageType::Type, const QByteArray &)));
 	Q_ASSERT(connected);
+
+	// detect a change on the user's contact
+	connected = QObject::connect(m_contactService, SIGNAL(contactUpdated(const QString &)),
+			this,
+			SLOT(updateContact(const QString &)));
+	Q_ASSERT(connected);
 	Q_UNUSED(connected);
 
 	// asynchronously populate displayPicture
@@ -46,6 +52,27 @@ FriendItem::FriendItem(QObject* parent, Contact& contact, ContactService* contac
 	m_statusMessage = m_contact.statusMessage();
 	m_personalMessage = m_contact.personalMessage();
 	m_ppId = m_contact.ppId();
+	m_handle = m_contact.handle();
+}
+
+void FriendItem::updateContact(const QString& contactHandle)
+{
+	const Contact contact = m_contactService->contact(contactHandle);
+	// if not a empty Contact
+	if (contact.displayName() != "") {
+		if (m_userStatus != contact.status()) {
+			m_userStatus = contact.status();
+			emit userStatusChanged(m_userStatus);
+		}
+		if (m_statusMessage != contact.statusMessage()) {
+			m_statusMessage = contact.statusMessage();
+			emit statusMessageChanged(m_statusMessage);
+		}
+		if (m_personalMessage != contact.personalMessage()) {
+			m_personalMessage = contact.personalMessage();
+			emit personalMessageChanged(m_personalMessage);
+		}
+	}
 }
 
 QString FriendItem::displayName() const
@@ -55,11 +82,6 @@ QString FriendItem::displayName() const
 
 Image FriendItem::profilePicture() const
 {
-	// asynchronously populate displayPicture
-	bool result = m_contactService->requestDisplayPicture(m_contact.handle());
-	if (!result) {
-		qWarning() << "FAILED TO GET FRIEND's PROFILE PICTURE";
-	}
 	return m_profilePicture;
 }
 
@@ -97,5 +119,8 @@ void FriendItem::updateFriendDisplayPicture(const QString& handle,
 												 const QByteArray& displayPicture)
 {
 	Q_UNUSED(imageType);
-	m_profilePicture = Utility::scaleImage(displayPicture, 140, 140);
+	if (m_handle == handle) {
+		m_profilePicture = Utility::scaleImage(displayPicture, 140, 140);
+		emit profilePictureChanged(m_profilePicture);
+	}
 }

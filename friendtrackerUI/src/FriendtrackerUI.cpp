@@ -278,7 +278,7 @@ void FriendtrackerUI::updateLocation(const QGeoCoordinate& coord)
 		m_coord = coord;
 	} else {
 		// update location when user moves more than 5m
-		if (m_coord.isValid() /*&& coord.distanceTo(m_coord) > 5.0*/) {
+		if (m_coord.isValid() && coord.distanceTo(m_coord) > 5.0) {
 			UpdateLocationMessage msg(m_profile->ppId(),
 					coord.latitude(),
 					coord.longitude(),
